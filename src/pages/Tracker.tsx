@@ -38,14 +38,17 @@ const Tracker = () => {
         if (error) throw error;
         
         // Transform data to match JobApplication type
-        const transformedData = data.map(job => ({
+        const transformedData: JobApplication[] = data.map(job => ({
           id: job.id,
+          userId: job.user_id || "",
           companyName: job.company_name,
           role: job.role,
           salaryLPA: job.salary_lpa,
-          interviewDate: job.interview_date,
-          status: job.status,
-          notes: job.notes || ""
+          interviewDate: new Date(job.interview_date),
+          status: job.status as "upcoming" | "completed" | "rejected",
+          notes: job.notes || "",
+          createdAt: new Date(job.created_at),
+          updatedAt: new Date(job.updated_at)
         }));
         
         setJobs(transformedData);

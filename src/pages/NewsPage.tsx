@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -36,7 +35,8 @@ const NewsPage = () => {
             company: "Google",
             category: "Tech",
             description: "Join our team to build cutting-edge web applications with React, TypeScript, and Node.js. 5+ years of experience required.",
-            url: "https://careers.google.com"
+            url: "https://careers.google.com",
+            createdAt: new Date()
           },
           {
             id: "2",
@@ -44,7 +44,8 @@ const NewsPage = () => {
             company: "Microsoft",
             category: "Tech",
             description: "Lead the development of AI-powered products. Experience with product management and AI/ML technologies required.",
-            url: "https://careers.microsoft.com"
+            url: "https://careers.microsoft.com",
+            createdAt: new Date()
           },
           {
             id: "3",
@@ -52,7 +53,8 @@ const NewsPage = () => {
             company: "Amazon",
             category: "Tech",
             description: "Build scalable applications using modern web technologies. Knowledge of AWS services is a plus.",
-            url: "https://amazon.jobs"
+            url: "https://amazon.jobs",
+            createdAt: new Date()
           },
           {
             id: "4",
@@ -60,7 +62,8 @@ const NewsPage = () => {
             company: "Netflix",
             category: "Data",
             description: "Analyze user data to improve recommendation algorithms. Strong background in machine learning required.",
-            url: "https://jobs.netflix.com"
+            url: "https://jobs.netflix.com",
+            createdAt: new Date()
           },
           {
             id: "5",
@@ -68,7 +71,8 @@ const NewsPage = () => {
             company: "Apple",
             category: "Design",
             description: "Create beautiful, intuitive user experiences for Apple products. Portfolio showcasing excellent design skills required.",
-            url: "https://apple.com/careers"
+            url: "https://apple.com/careers",
+            createdAt: new Date()
           },
           {
             id: "6",
@@ -76,7 +80,8 @@ const NewsPage = () => {
             company: "Facebook",
             category: "Marketing",
             description: "Develop and execute marketing strategies for our products. 3+ years of experience in digital marketing required.",
-            url: "https://meta.com/careers"
+            url: "https://meta.com/careers",
+            createdAt: new Date()
           },
           {
             id: "7",
@@ -84,7 +89,8 @@ const NewsPage = () => {
             company: "Spotify",
             category: "Tech",
             description: "Build and maintain our CI/CD pipelines and infrastructure. Experience with Kubernetes and AWS required.",
-            url: "https://spotifyjobs.com"
+            url: "https://spotifyjobs.com",
+            createdAt: new Date()
           },
           {
             id: "8",
@@ -92,7 +98,8 @@ const NewsPage = () => {
             company: "Uber",
             category: "Tech",
             description: "Develop mobile applications for iOS devices. Swift programming and Apple's Human Interface Guidelines knowledge required.",
-            url: "https://careers.uber.com"
+            url: "https://careers.uber.com",
+            createdAt: new Date()
           },
           {
             id: "9",
@@ -100,7 +107,8 @@ const NewsPage = () => {
             company: "IBM",
             category: "Data",
             description: "Build and deploy machine learning models to solve complex business problems. Experience with TensorFlow or PyTorch required.",
-            url: "https://ibm.com/careers"
+            url: "https://ibm.com/careers",
+            createdAt: new Date()
           },
           {
             id: "10",
@@ -108,7 +116,8 @@ const NewsPage = () => {
             company: "Oracle",
             category: "Content",
             description: "Create clear and concise technical documentation. Understanding of complex technical concepts required.",
-            url: "https://oracle.com/careers"
+            url: "https://oracle.com/careers",
+            createdAt: new Date()
           }
         ];
         

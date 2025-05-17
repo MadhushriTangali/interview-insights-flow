@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -34,6 +33,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "sonner";
 import { JobApplication } from "@/types";
+import { cn } from "@/lib/utils";
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -79,12 +79,15 @@ const JobDetails = () => {
         // Transform data to match JobApplication type
         const transformedData: JobApplication = {
           id: data.id,
+          userId: data.user_id || "",
           companyName: data.company_name,
           role: data.role,
           salaryLPA: data.salary_lpa,
-          interviewDate: data.interview_date,
-          status: data.status,
-          notes: data.notes || ""
+          interviewDate: new Date(data.interview_date),
+          status: data.status as "upcoming" | "completed" | "rejected",
+          notes: data.notes || "",
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
         };
         
         setJob(transformedData);
@@ -107,12 +110,12 @@ const JobDetails = () => {
       // Mock AI data for now - in a real app this would call an AI endpoint
       const mockQuestions = [
         { 
-          question: "What do you know about our company?", 
+          question: "What do you know about our company culture?", 
           answer: `${company} is known for its innovation in the tech industry. Be ready to discuss their recent products, company culture, and mission statement.`
         },
         { 
           question: "Why do you want this role?", 
-          answer: `Explain how your skills align with the ${role} position, and what attracts you to work with ${company}.` 
+          answer: `Explain how your skills align with the ${role} position and what attracts you to work with ${company}.` 
         },
         { 
           question: "Describe a challenging project you worked on.", 
