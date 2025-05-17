@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, ClipboardCheck, Star } from "lucide-react";
+import { Calendar, CheckCircle, ClipboardCheck, Star, Clock } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
