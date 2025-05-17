@@ -24,6 +24,11 @@ const Scheduler = () => {
     try {
       setIsLoading(true);
       
+      // Format the interview date properly
+      const interviewDate = formData.interviewDate instanceof Date ? 
+        formData.interviewDate.toISOString() : 
+        new Date(formData.interviewDate).toISOString();
+      
       const { error } = await supabase
         .from('job_applications')
         .insert({
@@ -31,7 +36,7 @@ const Scheduler = () => {
           company_name: formData.companyName,
           role: formData.role,
           salary_lpa: formData.salaryLPA,
-          interview_date: formData.interviewDate,
+          interview_date: interviewDate,
           interview_time: formData.interviewTime,
           status: formData.status,
           notes: formData.notes

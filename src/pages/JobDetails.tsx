@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -79,7 +80,7 @@ const JobDetails = () => {
         // Transform data to match JobApplication type
         const transformedData: JobApplication = {
           id: data.id,
-          userId: data.user_id || "",
+          userId: data.user_id,
           companyName: data.company_name,
           role: data.role,
           salaryLPA: data.salary_lpa,
@@ -222,7 +223,7 @@ const JobDetails = () => {
               </div>
               
               <div className="flex items-center space-x-3">
-                <Badge className={cn("px-3 py-1", statusColors[job.status as keyof typeof statusColors])}>
+                <Badge className={cn("px-3 py-1", statusColors[job.status])}>
                   {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                 </Badge>
                 

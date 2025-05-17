@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -59,133 +60,161 @@ const PrepPage = () => {
       setIsLoading(true);
       
       // Generate AI-powered interview questions
+      // In a real app, this would call an AI API endpoint
+      
+      // For now, we'll use a more sophisticated mock that feels like AI
       setTimeout(() => {
+        const companyName = company || "the company";
+        const jobRole = role || "the position";
+        
         const questionTypes = ["technical", "behavioral", "general", "company-specific"];
         
-        const mockQuestions: InterviewQuestion[] = [
-          {
-            id: "1",
-            question: "What do you know about our company culture?",
-            answer: `Research shows that ${company || 'this company'} values innovation and teamwork. Mention specific values from their website and how they align with your personal values.`,
-            type: "company-specific"
-          },
-          {
-            id: "2",
-            question: "Why are you interested in this position?",
-            answer: `Explain how your skills align specifically with the ${role || 'this role'} position and what attracts you to work with ${company || 'this company'}.`,
-            type: "general"
-          },
-          {
-            id: "3",
-            question: "Describe a challenging project you worked on.",
-            answer: "Choose a relevant project that showcases skills needed for this role. Describe the challenge, your approach, and the outcome.",
-            type: "behavioral"
-          },
-          {
-            id: "4",
-            question: "How do you handle tight deadlines?",
-            answer: "Demonstrate your time management skills with a specific example of how you prioritized tasks to meet an important deadline.",
-            type: "behavioral"
-          },
-          {
-            id: "5",
-            question: "What are your salary expectations?",
-            answer: "Research the market rates for this role and be prepared to give a range that aligns with your experience and the company's typical compensation.",
-            type: "general"
-          },
-          {
-            id: "6",
-            question: "Tell me about a time you failed and what you learned.",
-            answer: "Choose a genuine failure that wasn't catastrophic. Focus on what you learned and how it improved your subsequent work.",
-            type: "behavioral"
-          },
-          {
-            id: "7",
-            question: "How do you stay updated with industry trends?",
-            answer: "Mention specific blogs, communities, conferences, or courses you follow to stay updated with the latest technologies and methodologies.",
-            type: "general"
-          },
-          {
-            id: "8",
-            question: `What do you know about ${company || 'our'} products/services?`,
-            answer: `Research ${company || 'the company'}'s main products or services. Be specific about features you admire and how they solve problems for customers.`,
-            type: "company-specific"
-          },
-          {
-            id: "9",
-            question: "How would you improve our product?",
-            answer: "Research their product beforehand. Suggest realistic improvements that show you understand their market and customers.",
-            type: "company-specific"
-          },
-          {
-            id: "10",
-            question: "What's your approach to debugging a complex issue?",
-            answer: "Outline your systematic approach: reproducing the issue, isolating components, using debugging tools, and documenting the solution.",
-            type: "technical"
-          },
-          {
-            id: "11",
-            question: "How do you handle disagreements with team members?",
-            answer: "Describe a specific situation where you had a disagreement, how you approached it professionally, and how you reached a resolution.",
-            type: "behavioral"
-          },
-          {
-            id: "12",
-            question: "What are your greatest strengths and weaknesses?",
-            answer: "For strengths, focus on relevant skills for the role. For weaknesses, mention genuine areas of improvement and steps you're taking to address them.",
-            type: "general"
-          },
-          {
-            id: "13",
-            question: "Explain a complex technical concept in simple terms.",
-            answer: "Choose a concept relevant to the role and explain it without jargon, using analogies or examples that a non-technical person would understand.",
-            type: "technical"
-          },
-          {
-            id: "14",
-            question: "How do you prioritize tasks when you have multiple deadlines?",
-            answer: "Explain your methodology for prioritization (urgency vs importance matrix, impact assessment) and give a specific example of when you handled multiple deadlines.",
-            type: "behavioral"
-          },
-          {
-            id: "15",
-            question: "What questions do you have for us?",
-            answer: "Prepare thoughtful questions about the role, team structure, challenges, or growth opportunities that demonstrate your serious interest in the position.",
-            type: "general"
-          },
-          {
-            id: "16",
-            question: `What challenges do you think ${company || 'our company'} faces in the current market?`,
-            answer: `Research ${company || 'the company'}'s market position and competitors. Identify realistic challenges they might face and potential solutions.`,
-            type: "company-specific"
-          },
-          {
-            id: "17",
-            question: "Describe your ideal work environment.",
-            answer: "Align your answer with what you know about the company culture, but be honest about what helps you be productive.",
-            type: "general"
-          },
-          {
-            id: "18",
-            question: "How do you handle feedback and criticism?",
-            answer: "Describe how you actively seek feedback, listen without defensiveness, evaluate it objectively, and use it for improvement.",
-            type: "behavioral"
-          },
-          {
-            id: "19",
-            question: "What are your career goals for the next 5 years?",
-            answer: "Outline realistic goals that show ambition but also commitment to the company and role you're applying for.",
-            type: "general"
-          },
-          {
-            id: "20",
-            question: "How would your colleagues describe you?",
-            answer: "Choose 3-4 positive traits that are relevant to teamwork and the role, with brief examples of how you've demonstrated these traits.",
-            type: "behavioral"
-          }
-        ];
+        const generateQuestionSet = () => {
+          // Technical questions
+          const technicalQuestions = [
+            {
+              id: `tech-1-${Date.now()}`,
+              question: `What technologies and frameworks are you most experienced with for ${jobRole}?`,
+              answer: `Focus on technologies mentioned in the job description for ${companyName}. Explain your experience level with each, provide specific examples of projects where you've used them, and highlight any measurable outcomes.`,
+              type: "technical"
+            },
+            {
+              id: `tech-2-${Date.now()}`,
+              question: `Explain how you would design a scalable system for high traffic applications.`,
+              answer: `Discuss concepts like load balancing, caching strategies, database optimization, and horizontal scaling. Mention specific examples from your experience where you improved system performance.`,
+              type: "technical"
+            },
+            {
+              id: `tech-3-${Date.now()}`,
+              question: `How do you ensure code quality and maintainability in your projects?`,
+              answer: `Mention practices like code reviews, automated testing (unit, integration, e2e), CI/CD pipelines, documentation, and adherence to coding standards. If ${companyName} is known for specific engineering practices, align your answer accordingly.`,
+              type: "technical"
+            },
+            {
+              id: `tech-4-${Date.now()}`,
+              question: `Describe your approach to debugging a complex issue in a production environment.`,
+              answer: `Outline a systematic approach: analyzing logs, reproducing the issue in controlled environments, using monitoring tools, isolating components, implementing fixes, and validating solutions. Provide a specific example if possible.`,
+              type: "technical"
+            },
+            {
+              id: `tech-5-${Date.now()}`,
+              question: `How do you stay updated with the latest trends and technologies in your field?`,
+              answer: `Mention specific resources like technical blogs, conferences, online courses, community involvement, side projects, and professional networks. If ${companyName} uses cutting-edge technologies, emphasize your interest in those areas.`,
+              type: "technical"
+            }
+          ];
+          
+          // Behavioral questions
+          const behavioralQuestions = [
+            {
+              id: `behav-1-${Date.now()}`,
+              question: "Tell me about a time you faced a significant challenge in a project and how you overcame it.",
+              answer: "Use the STAR method (Situation, Task, Action, Result) to structure your response. Choose a relevant example that showcases skills needed for the role at " + companyName + ". Focus on your problem-solving approach and the positive outcome.",
+              type: "behavioral"
+            },
+            {
+              id: `behav-2-${Date.now()}`,
+              question: "Describe a situation where you had to work with a difficult team member.",
+              answer: "Focus on how you managed the relationship constructively. Highlight communication skills, empathy, and conflict resolution. Emphasize the positive outcome for the team and project, avoiding negative characterizations of the colleague.",
+              type: "behavioral"
+            },
+            {
+              id: `behav-3-${Date.now()}`,
+              question: "Give an example of when you had to make a difficult decision with limited information.",
+              answer: "Describe your decision-making process, how you gathered what information was available, assessed risks, and made a calculated decision. Explain the outcome and what you learned from the experience.",
+              type: "behavioral"
+            },
+            {
+              id: `behav-4-${Date.now()}`,
+              question: "Tell me about a time you received constructive criticism and how you responded to it.",
+              answer: "Choose an example that shows your growth mindset. Explain how you actively listened to the feedback, avoided defensiveness, implemented changes, and ultimately improved your performance or skills as a result.",
+              type: "behavioral"
+            },
+            {
+              id: `behav-5-${Date.now()}`,
+              question: "Describe a situation where you had to prioritize multiple important tasks with competing deadlines.",
+              answer: "Explain your prioritization methodology, how you communicated with stakeholders, delegated if appropriate, and managed your time effectively. Highlight your organizational skills and ability to work under pressure.",
+              type: "behavioral"
+            }
+          ];
+          
+          // General questions
+          const generalQuestions = [
+            {
+              id: `gen-1-${Date.now()}`,
+              question: "Why are you interested in this position?",
+              answer: `Connect your career goals and skills to the specific role at ${companyName}. Show that you've researched the position by referencing key responsibilities from the job description and explaining why they excite you.`,
+              type: "general"
+            },
+            {
+              id: `gen-2-${Date.now()}`,
+              question: "What are your greatest strengths and areas for development?",
+              answer: `For strengths, choose 2-3 that are directly relevant to the ${jobRole} position. For development areas, mention genuine areas for growth but frame them positively by explaining how you're actively working to improve them.`,
+              type: "general"
+            },
+            {
+              id: `gen-3-${Date.now()}`,
+              question: "Where do you see yourself professionally in 5 years?",
+              answer: `Outline realistic career goals that show ambition while aligning with potential growth paths at ${companyName}. Research career progression within the company if possible. Show commitment to developing deeper expertise in relevant areas.`,
+              type: "general"
+            },
+            {
+              id: `gen-4-${Date.now()}`,
+              question: "What's your ideal work environment?",
+              answer: `Research ${companyName}'s culture before answering. Describe elements that both match their known environment and genuinely help you thrive. Consider mentioning team dynamics, management style, and work-life balance factors.`,
+              type: "general"
+            },
+            {
+              id: `gen-5-${Date.now()}`,
+              question: "What are your salary expectations?",
+              answer: `Research the market rate for ${jobRole} positions in your area and at ${companyName} specifically if possible. Prepare to give a range rather than a specific number, and emphasize that you're flexible and more interested in the overall opportunity.`,
+              type: "general"
+            }
+          ];
+          
+          // Company-specific questions
+          const companySpecificQuestions = [
+            {
+              id: `comp-1-${Date.now()}`,
+              question: `What do you know about ${companyName} and why do you want to work here?`,
+              answer: `Research ${companyName}'s mission, values, products/services, recent news, and culture. Demonstrate genuine interest by connecting their mission to your personal values and career aspirations. Mention specific aspects of the company that appeal to you.`,
+              type: "company-specific"
+            },
+            {
+              id: `comp-2-${Date.now()}`,
+              question: `How do you think you can contribute to ${companyName}'s goals and success?`,
+              answer: `Connect your specific skills and experiences to the company's known challenges or objectives. Reference any industry knowledge you have and how your background would add value to their specific business context.`,
+              type: "company-specific"
+            },
+            {
+              id: `comp-3-${Date.now()}`,
+              question: `What excites you most about the products/services that ${companyName} offers?`,
+              answer: `Show that you've used or researched their products/services. Share specific features or aspects you admire and why they matter to users. If relevant, compare to competitors and highlight what makes ${companyName}'s offerings stand out.`,
+              type: "company-specific"
+            },
+            {
+              id: `comp-4-${Date.now()}`,
+              question: `How would you improve our product/service?`,
+              answer: `Offer constructive, well-reasoned suggestions based on your understanding of ${companyName}'s products and target audience. Balance praise with thoughtful ideas for enhancement. This shows analytical thinking without being overly critical.`,
+              type: "company-specific"
+            },
+            {
+              id: `comp-5-${Date.now()}`,
+              question: `What challenges do you think ${companyName} faces in the current market?`,
+              answer: `Research industry trends and ${companyName}'s position in the market. Mention 1-2 potential challenges but also discuss how these could be opportunities, showing strategic thinking and business awareness.`,
+              type: "company-specific"
+            }
+          ];
+          
+          return [
+            ...technicalQuestions, 
+            ...behavioralQuestions,
+            ...generalQuestions,
+            ...companySpecificQuestions
+          ];
+        };
         
-        setQuestions(mockQuestions);
+        setQuestions(generateQuestionSet());
         setIsLoading(false);
       }, 1500);
       

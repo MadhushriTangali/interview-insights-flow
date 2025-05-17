@@ -1,176 +1,264 @@
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { getCurrentUser, logout } from "@/lib/auth";
-import { 
-  Bell, 
-  Calendar, 
-  ChevronDown, 
-  Clipboard, 
-  LogOut, 
-  Menu, 
-  Settings, 
-  User 
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Bell,
+  Calendar,
+  ChevronDown,
+  LogOut,
+  Menu,
+  Moon,
+  Settings,
+  Sun,
+  User,
+  X,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Sidebar, SidebarTrigger } from "@/components/ui/sidebar";
+import { useTheme } from "@/hooks/use-theme";
+import { cn } from "@/lib/utils";
+import { getCurrentUser, logout } from "@/lib/auth";
 
-export function Header() {
+const navigation = [
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    requireAuth: true,
+    hidden: false,
+  },
+  {
+    name: "Interview Scheduler",
+    href: "/scheduler",
+    requireAuth: true,
+    hidden: false,
+  },
+  {
+    name: "Interview Tracker",
+    href: "/tracker",
+    requireAuth: true,
+    hidden: false,
+  },
+  {
+    name: "Preparation",
+    href: "/prep",
+    requireAuth: true,
+    hidden: false,
+  },
+  {
+    name: "News & Hiring",
+    href: "/news",
+    requireAuth: false,
+    hidden: false,
+  },
+];
+
+export default function Header() {
+  const { theme, setTheme } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(getCurrentUser());
   
+  // Update user on location change
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
-  const NavItems = () => (
-    <>
-      <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors">
-        Dashboard
-      </Link>
-      <Link to="/scheduler" className="text-foreground hover:text-primary transition-colors">
-        Scheduler
-      </Link>
-      <Link to="/tracker" className="text-foreground hover:text-primary transition-colors">
-        Job Tracker
-      </Link>
-      <Link to="/prep" className="text-foreground hover:text-primary transition-colors">
-        Interview Prep
-      </Link>
-      <Link to="/news" className="text-foreground hover:text-primary transition-colors">
-        News & Hiring
-      </Link>
-    </>
-  );
-
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-      <div className="container flex h-16 items-center justify-between py-4">
-        <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2">
-            <Calendar className="size-5 text-primary" />
-            <span className="font-bold text-xl">InterviewPro</span>
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {user && <NavItems />}
-          </nav>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {user ? (
-            <>
-              {/* Notifications */}
+    <header className="sticky top-0 z-40 w-full border-b bg-background">
+      <div className="container flex h-16 items-center">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 font-bold">
+          <Calendar className="h-6 w-6" />
+          <span>InterviewBuddy</span>
+        </Link>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:ml-10 md:flex md:items-center md:gap-4 md:space-x-4 lg:space-x-6">
+          {navigation
+            .filter((item) => !item.hidden && (!item.requireAuth || user))
+            .map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-foreground/80",
+                  location.pathname === item.href
+                    ? "text-foreground"
+                    : "text-foreground/60"
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
+        </nav>
+
+        {/* Mobile Menu Button */}
+        <div className="flex flex-1 items-center justify-end md:justify-end">
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="mr-1"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            {/* User Menu (if logged in) */}
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary"></span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="max-h-80 overflow-auto">
-                    <div className="p-3 hover:bg-muted cursor-pointer">
-                      <p className="font-medium">Google Interview Tomorrow</p>
-                      <p className="text-sm text-muted-foreground">Your interview is scheduled for tomorrow at 2:00 PM</p>
-                      <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
-                    </div>
-                    <div className="p-3 hover:bg-muted cursor-pointer">
-                      <p className="font-medium">Feedback Reminder</p>
-                      <p className="text-sm text-muted-foreground">Don't forget to rate your Microsoft interview</p>
-                      <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
-                    </div>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="gap-2">
-                    <Avatar className="h-8 w-8">
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
+                    <Avatar className="h-9 w-9">
                       <AvatarImage src={user.photoURL || ""} alt={user.name} />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>
+                        {user.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="hidden md:inline-block">{user.name.split(' ')[0]}</span>
-                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>
+                    {user.name || user.email}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/profile')}>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/feedback")}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
-              {/* Mobile Navigation */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-72">
-                  <div className="flex flex-col gap-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="size-5 text-primary" />
-                      <span className="font-bold text-xl">InterviewPro</span>
-                    </div>
-                    <nav className="flex flex-col space-y-4">
-                      <NavItems />
-                      <Link to="/profile" className="text-foreground hover:text-primary transition-colors flex items-center gap-2">
-                        <User className="size-4" /> Profile
-                      </Link>
-                      <Link to="/settings" className="text-foreground hover:text-primary transition-colors flex items-center gap-2">
-                        <Settings className="size-4" /> Settings
-                      </Link>
-                      <button 
-                        onClick={handleLogout}
-                        className="text-foreground hover:text-primary transition-colors flex items-center gap-2 text-left"
-                      >
-                        <LogOut className="size-4" /> Logout
-                      </button>
-                    </nav>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </Button>
+            )}
+
+            {/* Mobile Menu */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="md:hidden"
+                  size="icon"
+                  onClick={() => setIsMobileMenuOpen(true)}
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="pr-0">
+                <div className="flex flex-col space-y-4 p-4">
+                  <div className="flex items-center justify-between">
+                    <Link
+                      to="/"
+                      className="flex items-center gap-2 font-bold"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Calendar className="h-6 w-6" />
+                      <span>InterviewBuddy</span>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <X className="h-5 w-5" />
+                      <span className="sr-only">Close menu</span>
+                    </Button>
                   </div>
-                </SheetContent>
-              </Sheet>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
-              <Button onClick={() => navigate('/register')}>Register</Button>
-            </>
-          )}
+
+                  <nav className="flex flex-col space-y-2">
+                    {navigation
+                      .filter((item) => !item.hidden && (!item.requireAuth || user))
+                      .map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={cn(
+                            "flex py-2 text-base font-medium transition-colors hover:text-foreground/80",
+                            location.pathname === item.href
+                              ? "text-foreground"
+                              : "text-foreground/60"
+                          )}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                  </nav>
+
+                  <div className="flex flex-col space-y-2 pt-4">
+                    {!user && (
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          navigate("/login");
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        Sign In
+                      </Button>
+                    )}
+                    {user && (
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        Log Out
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
   );
 }
-
-export default Header;

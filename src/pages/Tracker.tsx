@@ -37,21 +37,25 @@ const Tracker = () => {
         
         if (error) throw error;
         
-        // Transform data to match JobApplication type
-        const transformedData: JobApplication[] = data.map(job => ({
-          id: job.id,
-          userId: job.user_id || "",
-          companyName: job.company_name,
-          role: job.role,
-          salaryLPA: job.salary_lpa,
-          interviewDate: new Date(job.interview_date),
-          status: job.status as "upcoming" | "completed" | "rejected",
-          notes: job.notes || "",
-          createdAt: new Date(job.created_at),
-          updatedAt: new Date(job.updated_at)
-        }));
-        
-        setJobs(transformedData);
+        if (data && data.length > 0) {
+          // Transform data to match JobApplication type
+          const transformedData: JobApplication[] = data.map(job => ({
+            id: job.id,
+            userId: job.user_id,
+            companyName: job.company_name,
+            role: job.role,
+            salaryLPA: job.salary_lpa,
+            interviewDate: new Date(job.interview_date),
+            status: job.status as "upcoming" | "completed" | "rejected",
+            notes: job.notes || "",
+            createdAt: new Date(job.created_at),
+            updatedAt: new Date(job.updated_at)
+          }));
+          
+          setJobs(transformedData);
+        } else {
+          setJobs([]);
+        }
       } catch (error) {
         console.error("Error fetching job applications:", error);
         toast.error("Failed to load your interviews");

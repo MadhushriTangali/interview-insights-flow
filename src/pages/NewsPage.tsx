@@ -1,150 +1,159 @@
+
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Calendar, Search, Tag, Building, Globe, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { NewsItem } from "@/types";
-import { toast } from "sonner";
+
+interface NewsItem {
+  id: string;
+  title: string;
+  company: string;
+  category: string;
+  description: string;
+  url: string;
+  createdAt: Date; // Added required createdAt field
+}
 
 const NewsPage = () => {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Generate AI-powered job listings
+
   useEffect(() => {
-    const fetchJobOpenings = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Mock AI-generated job listings
-        const mockJobListings: NewsItem[] = [
+    // Simulate fetching news/jobs from an AI API
+    const fetchNewsAndJobs = async () => {
+      setIsLoading(true);
+      
+      // Simulating API delay
+      setTimeout(() => {
+        const mockNews: NewsItem[] = [
           {
             id: "1",
-            title: "Senior Software Engineer - React",
+            title: "Senior Frontend Developer",
             company: "Google",
             category: "Tech",
-            description: "Join our team to build cutting-edge web applications with React, TypeScript, and Node.js. 5+ years of experience required.",
+            description: "Google is hiring senior frontend developers with expertise in React, Angular, or Vue. Join our team to build cutting-edge web applications.",
             url: "https://careers.google.com",
-            createdAt: new Date()
+            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
           },
           {
             id: "2",
-            title: "Product Manager - AI Products",
+            title: "Data Scientist",
             company: "Microsoft",
             category: "Tech",
-            description: "Lead the development of AI-powered products. Experience with product management and AI/ML technologies required.",
+            description: "Microsoft is looking for data scientists with experience in machine learning and artificial intelligence to join our growing team.",
             url: "https://careers.microsoft.com",
-            createdAt: new Date()
+            createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
           },
           {
             id: "3",
-            title: "Full Stack Developer",
-            company: "Amazon",
-            category: "Tech",
-            description: "Build scalable applications using modern web technologies. Knowledge of AWS services is a plus.",
-            url: "https://amazon.jobs",
-            createdAt: new Date()
+            title: "Product Manager",
+            company: "Apple",
+            category: "Product",
+            description: "Apple is seeking experienced product managers to lead the development of innovative products that will shape the future.",
+            url: "https://jobs.apple.com",
+            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
           },
           {
             id: "4",
-            title: "Data Scientist",
-            company: "Netflix",
-            category: "Data",
-            description: "Analyze user data to improve recommendation algorithms. Strong background in machine learning required.",
-            url: "https://jobs.netflix.com",
-            createdAt: new Date()
+            title: "DevOps Engineer",
+            company: "Amazon",
+            category: "Tech",
+            description: "Amazon Web Services is hiring DevOps engineers to help build and maintain our cloud infrastructure.",
+            url: "https://amazon.jobs",
+            createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 days ago
           },
           {
             id: "5",
-            title: "UX Designer",
-            company: "Apple",
+            title: "UX/UI Designer",
+            company: "Meta",
             category: "Design",
-            description: "Create beautiful, intuitive user experiences for Apple products. Portfolio showcasing excellent design skills required.",
-            url: "https://apple.com/careers",
-            createdAt: new Date()
+            description: "Meta is looking for talented UX/UI designers to create engaging and intuitive user experiences for our platforms.",
+            url: "https://careers.meta.com",
+            createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
           },
           {
             id: "6",
-            title: "Marketing Manager",
-            company: "Facebook",
-            category: "Marketing",
-            description: "Develop and execute marketing strategies for our products. 3+ years of experience in digital marketing required.",
-            url: "https://meta.com/careers",
-            createdAt: new Date()
+            title: "Backend Developer",
+            company: "Netflix",
+            category: "Tech",
+            description: "Netflix is seeking backend developers with experience in distributed systems to join our engineering team.",
+            url: "https://jobs.netflix.com",
+            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
           },
           {
             id: "7",
-            title: "DevOps Engineer",
-            company: "Spotify",
-            category: "Tech",
-            description: "Build and maintain our CI/CD pipelines and infrastructure. Experience with Kubernetes and AWS required.",
-            url: "https://spotifyjobs.com",
-            createdAt: new Date()
+            title: "Marketing Manager",
+            company: "Salesforce",
+            category: "Marketing",
+            description: "Salesforce is hiring marketing managers to drive growth and build brand awareness for our cloud products.",
+            url: "https://careers.salesforce.com",
+            createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) // 6 days ago
           },
           {
             id: "8",
-            title: "iOS Developer",
-            company: "Uber",
+            title: "Software Engineer",
+            company: "LinkedIn",
             category: "Tech",
-            description: "Develop mobile applications for iOS devices. Swift programming and Apple's Human Interface Guidelines knowledge required.",
-            url: "https://careers.uber.com",
-            createdAt: new Date()
+            description: "LinkedIn is looking for software engineers to help build and scale our professional networking platform.",
+            url: "https://careers.linkedin.com",
+            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
           },
           {
             id: "9",
-            title: "Machine Learning Engineer",
+            title: "HR Specialist",
             company: "IBM",
-            category: "Data",
-            description: "Build and deploy machine learning models to solve complex business problems. Experience with TensorFlow or PyTorch required.",
-            url: "https://ibm.com/careers",
-            createdAt: new Date()
+            category: "HR",
+            description: "IBM is seeking HR specialists to support our global workforce and implement innovative HR practices.",
+            url: "https://careers.ibm.com",
+            createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
           },
           {
             id: "10",
-            title: "Technical Writer",
+            title: "Cloud Architect",
             company: "Oracle",
-            category: "Content",
-            description: "Create clear and concise technical documentation. Understanding of complex technical concepts required.",
+            category: "Tech",
+            description: "Oracle Cloud Infrastructure is hiring experienced cloud architects to design and implement robust cloud solutions.",
             url: "https://oracle.com/careers",
-            createdAt: new Date()
+            createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
           }
         ];
         
-        // Simulate API delay
-        setTimeout(() => {
-          setNewsItems(mockJobListings);
-          setIsLoading(false);
-        }, 1000);
-        
-      } catch (error) {
-        console.error("Error fetching job openings:", error);
-        toast.error("Failed to load job openings");
+        setNews(mockNews);
         setIsLoading(false);
-      }
+      }, 1000);
     };
     
-    fetchJobOpenings();
+    fetchNewsAndJobs();
   }, []);
+
+  // Filter news based on search query and category
+  const filteredNews = news.filter(item => {
+    const matchesSearch = searchQuery === "" || 
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+    
+    return matchesSearch && matchesCategory;
+  });
   
-  // Get unique categories for filtering
-  const categories = Array.from(new Set(newsItems.map(item => item.category)));
-  
-  // Filter news based on selected category
-  const filteredNews = activeCategory === "all" 
-    ? newsItems 
-    : newsItems.filter(item => item.category === activeCategory);
-  
+  // Get unique categories
+  const categories = ["all", ...Array.from(new Set(news.map(item => item.category)))];
+
   return (
     <>
       <Header />
@@ -154,91 +163,90 @@ const NewsPage = () => {
           <div className="mb-8">
             <h1 className="text-3xl font-bold">News & Hiring</h1>
             <p className="text-muted-foreground">
-              Latest hiring updates from top companies
+              Stay updated with the latest job openings and industry news
             </p>
           </div>
           
+          {/* Search and Filter */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="md:col-span-2">
+              <Input
+                placeholder="Search jobs or companies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category === "all" ? "All Categories" : category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {/* News List */}
           {isLoading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
-          ) : (
-            <>
-              {/* Category Tabs */}
-              <Tabs 
-                defaultValue="all" 
-                className="mb-8"
-                onValueChange={(value) => setActiveCategory(value)}
-              >
-                <TabsList className="mb-4 w-full justify-start overflow-x-auto">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  {categories.map((category) => (
-                    <TabsTrigger key={category} value={category}>
-                      {category}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-              
-              {/* News Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredNews.map((item) => (
-                  <Card key={item.id} className="flex flex-col h-full">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-xl">{item.title}</CardTitle>
-                          <CardDescription className="mt-1">{item.company}</CardDescription>
+          ) : filteredNews.length > 0 ? (
+            <div className="space-y-6">
+              {filteredNews.map((item) => (
+                <div key={item.id} className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="bg-card p-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h2 className="text-xl font-semibold mb-2">{item.title}</h2>
+                        <div className="flex items-center text-muted-foreground mb-4">
+                          <Building className="h-4 w-4 mr-1" />
+                          <span className="mr-4">{item.company}</span>
+                          <Tag className="h-4 w-4 mr-1" />
+                          <span>{item.category}</span>
                         </div>
-                        <Badge variant="outline">{item.category}</Badge>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pb-4 flex-grow">
-                      <p className="text-muted-foreground">{item.description}</p>
-                    </CardContent>
-                    <CardFooter className="pt-0">
-                      <Button 
-                        variant="outline" 
-                        className="w-full" 
-                        onClick={() => window.open(item.url, "_blank")}
-                      >
-                        View Details <ExternalLink className="ml-2 h-4 w-4" />
+                      <Badge>{new Date(item.createdAt).toLocaleDateString()}</Badge>
+                    </div>
+                    
+                    <p className="text-muted-foreground mb-4">{item.description}</p>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>Posted {new Date(item.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={item.url} target="_blank" rel="noreferrer" className="flex items-center">
+                          <Globe className="h-4 w-4 mr-2" />
+                          Apply Now
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </a>
                       </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-              
-              {filteredNews.length === 0 && (
-                <div className="text-center py-12">
-                  <h3 className="text-xl font-semibold mb-2">No job openings found</h3>
-                  <p className="text-muted-foreground mb-6">
-                    There are no job openings in the selected category.
-                  </p>
-                  <Button onClick={() => setActiveCategory("all")}>
-                    View All Job Openings
-                  </Button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="bg-muted/50 rounded-full p-6 inline-flex mb-4">
+                <Search className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No results found</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your search or filter to find what you're looking for
+              </p>
+            </div>
           )}
-          
-          {/* Newsletter Subscription */}
-          <Card className="mt-12">
-            <CardContent className="p-6 md:p-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold">Stay Updated</h2>
-                  <p className="text-muted-foreground">
-                    Subscribe to receive notifications about new job openings and hiring trends.
-                  </p>
-                </div>
-                <div className="flex space-x-4">
-                  <Button>Subscribe</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </main>
       
