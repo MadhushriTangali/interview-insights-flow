@@ -39,16 +39,19 @@ const Scheduler = () => {
           interview_date: interviewDate,
           interview_time: formData.interviewTime,
           status: formData.status,
-          notes: formData.notes
+          notes: formData.notes || "" // Ensure notes is never null
         });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error details:", error);
+        throw error;
+      }
       
       toast.success("Interview scheduled successfully!");
       navigate("/tracker");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving job application:", error);
-      toast.error("Failed to save interview");
+      toast.error(`Failed to save interview: ${error.message || "Unknown error"}`);
     } finally {
       setIsLoading(false);
     }

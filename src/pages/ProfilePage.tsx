@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,7 +42,12 @@ const profileSchema = z.object({
 });
 
 const ProfilePage = () => {
-  const user = getCurrentUser();
+  const [user, setUser] = useState(getCurrentUser());
+  
+  // Update user when component mounts and when location changes
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
   
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -55,6 +60,14 @@ const ProfilePage = () => {
     },
   });
   
+  // Update form values when user changes
+  useEffect(() => {
+    if (user) {
+      form.setValue("name", user.name || "");
+      form.setValue("email", user.email || "");
+    }
+  }, [user, form]);
+  
   const [emailNotification, setEmailNotification] = useState(true);
   const [mobileNotification, setMobileNotification] = useState(false);
   const [upcomingInterviews, setUpcomingInterviews] = useState(true);
@@ -64,6 +77,32 @@ const ProfilePage = () => {
   function onSubmit(values: z.infer<typeof profileSchema>) {
     console.log("Profile updated:", values);
     toast.success("Profile updated successfully!");
+  }
+  
+  if (!user) {
+    return (
+      <>
+        <Header />
+        <main className="flex-1 py-8">
+          <div className="container px-4 md:px-6 max-w-4xl text-center">
+            <Card>
+              <CardHeader>
+                <CardTitle>Please Login First</CardTitle>
+                <CardDescription>
+                  You need to be logged in to view and edit your profile
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => window.location.href = "/login"}>
+                  Go to Login
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
   }
   
   return (
@@ -257,7 +296,7 @@ const ProfilePage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">New Company Alerts</p>
-                        <p className="text-sm text-m uted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           Notify me about new companies hiring
                         </p>
                       </div>

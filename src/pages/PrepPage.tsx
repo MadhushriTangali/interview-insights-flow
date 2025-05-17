@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -363,12 +362,6 @@ const PrepPage = () => {
                 </Card>
               )}
               
-              <div className="mt-8 text-center">
-                <p className="text-muted-foreground mb-4">
-                  Want more personalized preparation help?
-                </p>
-                <Button>Get AI Interview Coach</Button>
-              </div>
             </>
           )}
           

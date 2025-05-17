@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -85,6 +84,7 @@ const JobDetails = () => {
           role: data.role,
           salaryLPA: data.salary_lpa,
           interviewDate: new Date(data.interview_date),
+          interviewTime: data.interview_time,
           status: data.status as "upcoming" | "completed" | "rejected",
           notes: data.notes || "",
           createdAt: new Date(data.created_at),
@@ -206,155 +206,167 @@ const JobDetails = () => {
       
       <main className="flex-1 py-8">
         <div className="container px-4 md:px-6">
-          <div className="mb-6">
-            <Button 
-              variant="ghost" 
-              className="flex items-center mb-4" 
-              onClick={() => navigate("/tracker")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Tracker
-            </Button>
-            
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold">{job.role}</h1>
-                <p className="text-xl text-muted-foreground">{job.companyName}</p>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Badge className={cn("px-3 py-1", statusColors[job.status])}>
-                  {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                </Badge>
-                
-                <Button variant="outline" size="sm" onClick={() => navigate(`/edit-job/${job.id}`)}>
-                  <Edit className="h-4 w-4 mr-2" /> Edit
+          
+          
+          {job && !isLoading && (
+            <>
+              <div className="mb-6">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center mb-4" 
+                  onClick={() => navigate("/tracker")}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Tracker
                 </Button>
                 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
-                      <Trash className="h-4 w-4 mr-2" /> Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the interview
-                        from our servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Left column with job details */}
-            <div className="md:col-span-1">
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Interview Details</h2>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <Building className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Company</p>
-                        <p className="font-medium">{job.companyName}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <User className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Role</p>
-                        <p className="font-medium">{job.role}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <Calendar className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Date</p>
-                        <p className="font-medium">{format(new Date(job.interviewDate), "PPP")}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <Clock className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Time</p>
-                        <p className="font-medium">{format(new Date(job.interviewDate), "h:mm a")}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start">
-                      <Coins className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Salary</p>
-                        <p className="font-medium">₹{job.salaryLPA} LPA</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Separator className="my-4" />
-                  
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <div className="flex items-start mb-2">
-                      <FileText className="h-5 w-5 mr-3 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">Notes</p>
-                    </div>
-                    <div className="pl-8">
-                      {job.notes ? (
-                        <p className="whitespace-pre-wrap">{job.notes}</p>
-                      ) : (
-                        <p className="text-muted-foreground italic">No notes added</p>
-                      )}
-                    </div>
+                    <h1 className="text-3xl font-bold">{job.role}</h1>
+                    <p className="text-xl text-muted-foreground">{job.companyName}</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Right column with preparation questions */}
-            <div className="md:col-span-2">
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Preparation Questions</h2>
                   
-                  {isLoadingPrep ? (
-                    <div className="flex justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {aiPrep.map((item, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <h3 className="font-semibold text-lg mb-2">{item.question}</h3>
-                          <p className="text-muted-foreground">{item.answer}</p>
-                        </div>
-                      ))}
-                      
-                      <div className="pt-4">
-                        <Button onClick={() => navigate(`/prep?company=${job.companyName}&role=${job.role}`)} className="w-full">
-                          Get More Preparation Questions
+                  <div className="flex items-center space-x-3">
+                    <Badge className={cn("px-3 py-1", statusColors[job.status])}>
+                      {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                    </Badge>
+                    
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/edit-job/${job.id}`)}>
+                      <Edit className="h-4 w-4 mr-2" /> Edit
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+                          <Trash className="h-4 w-4 mr-2" /> Delete
                         </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the interview
+                            from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Left column with job details */}
+                <div className="md:col-span-1">
+                  <Card>
+                    <CardContent className="p-6">
+                      <h2 className="text-xl font-semibold mb-4">Interview Details</h2>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-start">
+                          <Building className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Company</p>
+                            <p className="font-medium">{job.companyName}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <User className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Role</p>
+                            <p className="font-medium">{job.role}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <Calendar className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Date</p>
+                            <p className="font-medium">{format(new Date(job.interviewDate), "PPP")}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <Clock className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Time</p>
+                            <p className="font-medium">{format(new Date(job.interviewDate), "h:mm a")}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start">
+                          <Coins className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Salary</p>
+                            <p className="font-medium">₹{job.salaryLPA} LPA</p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                      
+                      <Separator className="my-4" />
+                      
+                      <div>
+                        <div className="flex items-start mb-2">
+                          <FileText className="h-5 w-5 mr-3 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">Notes</p>
+                        </div>
+                        <div className="pl-8">
+                          {job.notes ? (
+                            <p className="whitespace-pre-wrap">{job.notes}</p>
+                          ) : (
+                            <p className="text-muted-foreground italic">No notes added</p>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {/* Right column with preparation questions */}
+                <div className="md:col-span-2">
+                  <Card>
+                    <CardContent className="p-6">
+                      <h2 className="text-xl font-semibold mb-4">Preparation Questions</h2>
+                      
+                      {isLoadingPrep ? (
+                        <div className="flex justify-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {aiPrep.map((item, index) => (
+                            <div key={index} className="border rounded-lg p-4">
+                              <h3 className="font-semibold text-lg mb-2">{item.question}</h3>
+                              <p className="text-muted-foreground">{item.answer}</p>
+                            </div>
+                          ))}
+                          
+                          <div className="pt-4">
+                            <Button onClick={() => navigate(`/prep?company=${job.companyName}&role=${job.role}`)} className="w-full">
+                              Get More Preparation Questions
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </>
+          )}
+          
+          {isLoading && (
+            <div className="flex justify-center items-center py-16">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
             </div>
-          </div>
+          )}
         </div>
       </main>
       

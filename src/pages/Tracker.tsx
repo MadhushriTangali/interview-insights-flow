@@ -17,6 +17,7 @@ const Tracker = () => {
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected">("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     const fetchJobs = async () => {
@@ -30,6 +31,8 @@ const Tracker = () => {
       
       try {
         setIsLoading(true);
+        setError(null);
+        
         const { data, error } = await supabase
           .from('job_applications')
           .select('*')
@@ -46,6 +49,7 @@ const Tracker = () => {
             role: job.role,
             salaryLPA: job.salary_lpa,
             interviewDate: new Date(job.interview_date),
+            interviewTime: job.interview_time,
             status: job.status as "upcoming" | "completed" | "rejected",
             notes: job.notes || "",
             createdAt: new Date(job.created_at),
@@ -56,8 +60,9 @@ const Tracker = () => {
         } else {
           setJobs([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching job applications:", error);
+        setError(error.message || "Failed to load your interviews");
         toast.error("Failed to load your interviews");
       } finally {
         setIsLoading(false);
@@ -126,6 +131,32 @@ const Tracker = () => {
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="bg-red-100 dark:bg-red-900/30 rounded-full p-6 mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-red-500 h-12 w-12"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Error Loading Interviews</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">{error}</p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
             </div>
           ) : filteredJobs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
