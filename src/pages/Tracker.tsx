@@ -7,22 +7,79 @@ import { Plus } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { JobCard } from "@/components/job/job-card";
-import { dummyJobs, JobApplication } from "@/types";
+import { JobApplication } from "@/types";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { getCurrentUser } from "@/lib/auth";
 
 const Tracker = () => {
   const navigate = useNavigate();
-  const [jobs, setJobs] = useState<JobApplication[]>(dummyJobs);
+  const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected">("all");
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchJobs = async () => {
+      const user = getCurrentUser();
+      
+      if (!user) {
+        toast.error("Please log in to view your interviews");
+        navigate("/login");
+        return;
+      }
+      
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('job_applications')
+          .select('*')
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+        
+        // Transform data to match JobApplication type
+        const transformedData = data.map(job => ({
+          id: job.id,
+          companyName: job.company_name,
+          role: job.role,
+          salaryLPA: job.salary_lpa,
+          interviewDate: job.interview_date,
+          status: job.status,
+          notes: job.notes || ""
+        }));
+        
+        setJobs(transformedData);
+      } catch (error) {
+        console.error("Error fetching job applications:", error);
+        toast.error("Failed to load your interviews");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchJobs();
+  }, [navigate]);
   
   // Filter jobs based on status
   const filteredJobs = filter === "all" 
     ? jobs 
     : jobs.filter(job => job.status === filter);
   
-  const handleDeleteJob = (id: string) => {
-    setJobs(jobs.filter(job => job.id !== id));
-    toast.success("Job application deleted successfully");
+  const handleDeleteJob = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('job_applications')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setJobs(jobs.filter(job => job.id !== id));
+      toast.success("Interview deleted successfully");
+    } catch (error) {
+      console.error("Error deleting job application:", error);
+      toast.error("Failed to delete interview");
+    }
   };
   
   return (
@@ -33,9 +90,9 @@ const Tracker = () => {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Job Tracker</h1>
+              <h1 className="text-3xl font-bold">Interview Tracker</h1>
               <p className="text-muted-foreground">
-                Manage and track all your job applications
+                Manage and track all your interview applications
               </p>
             </div>
             <Button 
@@ -43,7 +100,7 @@ const Tracker = () => {
               className="sm:w-auto w-full flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              Add New Job
+              Add New Interview
             </Button>
           </div>
           
@@ -59,7 +116,11 @@ const Tracker = () => {
           </Tabs>
           
           {/* Job List */}
-          {filteredJobs.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : filteredJobs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredJobs.map((job) => (
                 <JobCard 
@@ -96,11 +157,11 @@ const Tracker = () => {
                   <path d="M16 18h.01" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">No job applications found</h3>
+              <h3 className="text-xl font-semibold mb-2">No interviews found</h3>
               <p className="text-muted-foreground mb-6 max-w-md">
                 {filter === "all" 
-                  ? "You haven't added any job applications yet. Add your first one to start tracking."
-                  : `You don't have any ${filter} job applications.`}
+                  ? "You haven't added any interviews yet. Add your first one to start tracking."
+                  : `You don't have any ${filter} interviews.`}
               </p>
               <Button onClick={() => navigate("/scheduler")}>
                 Schedule Your First Interview

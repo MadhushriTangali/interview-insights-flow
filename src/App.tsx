@@ -11,6 +11,7 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Scheduler from "./pages/Scheduler";
 import Tracker from "./pages/Tracker";
+import JobDetails from "./pages/JobDetails";
 import PrepPage from "./pages/PrepPage";
 import RatingPage from "./pages/RatingPage";
 import FeedbackPage from "./pages/FeedbackPage";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/scheduler" element={<Scheduler />} />
           <Route path="/tracker" element={<Tracker />} />
+          <Route path="/job-details/:id" element={<JobDetails />} />
           <Route path="/prep" element={<PrepPage />} />
           <Route path="/rate/:jobId" element={<RatingPage />} />
           <Route path="/feedback" element={<FeedbackPage />} />

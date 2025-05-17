@@ -54,7 +54,7 @@ export function JobCard({ job, onDelete }: JobCardProps) {
   };
 
   const handleView = () => {
-    navigate(`/job/${job.id}`);
+    navigate(`/job-details/${job.id}`);
   };
   
   const handleRate = () => {
@@ -76,7 +76,7 @@ export function JobCard({ job, onDelete }: JobCardProps) {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Badge className={cn(statusColors[job.status])}>
+            <Badge className={cn(statusColors[job.status as keyof typeof statusColors])}>
               {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
             </Badge>
             
@@ -103,8 +103,8 @@ export function JobCard({ job, onDelete }: JobCardProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the job
-                        application from our servers.
+                        This action cannot be undone. This will permanently delete the interview
+                        from our servers.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

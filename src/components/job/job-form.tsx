@@ -51,11 +51,11 @@ const jobFormSchema = z.object({
 type JobFormProps = {
   initialData?: z.infer<typeof jobFormSchema> & { id: string };
   onSave: (data: z.infer<typeof jobFormSchema>) => void;
+  isLoading?: boolean;
 };
 
-export function JobForm({ initialData, onSave }: JobFormProps) {
+export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps) {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof jobFormSchema>>({
     resolver: zodResolver(jobFormSchema),
@@ -70,7 +70,6 @@ export function JobForm({ initialData, onSave }: JobFormProps) {
   });
 
   const handleSubmit = async (data: z.infer<typeof jobFormSchema>) => {
-    setIsLoading(true);
     try {
       // Combine date and time
       const combined = new Date(data.interviewDate);
@@ -81,14 +80,9 @@ export function JobForm({ initialData, onSave }: JobFormProps) {
         ...data,
         interviewDate: combined,
       });
-      
-      toast.success(initialData ? "Job updated successfully" : "Job added successfully");
-      navigate("/tracker");
     } catch (error) {
       console.error("Error saving job:", error);
-      toast.error("Failed to save job details");
-    } finally {
-      setIsLoading(false);
+      toast.error("Failed to save interview details");
     }
   };
 
@@ -250,10 +244,10 @@ export function JobForm({ initialData, onSave }: JobFormProps) {
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : initialData ? "Update Job" : "Add Job"}
+            {isLoading ? "Saving..." : initialData ? "Update Interview" : "Add Interview"}
           </Button>
         </div>
       </form>
     </Form>
   );
-}
+};

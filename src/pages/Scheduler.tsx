@@ -5,16 +5,48 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { JobForm } from "@/components/job/job-form";
 import { toast } from "sonner";
-import { dummyJobs } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
+import { getCurrentUser } from "@/lib/auth";
 
 const Scheduler = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
-  const handleSaveJob = (formData: any) => {
-    // In a real application, this would save to a database
-    console.log("Saving job application:", formData);
-    toast.success("Job application saved successfully!");
-    navigate("/tracker");
+  const handleSaveJob = async (formData: any) => {
+    const user = getCurrentUser();
+    
+    if (!user) {
+      toast.error("Please log in to save an interview");
+      navigate("/login");
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      const { error } = await supabase
+        .from('job_applications')
+        .insert({
+          user_id: user.id,
+          company_name: formData.companyName,
+          role: formData.role,
+          salary_lpa: formData.salaryLPA,
+          interview_date: formData.interviewDate,
+          interview_time: formData.interviewTime,
+          status: formData.status,
+          notes: formData.notes
+        });
+      
+      if (error) throw error;
+      
+      toast.success("Interview scheduled successfully!");
+      navigate("/tracker");
+    } catch (error) {
+      console.error("Error saving job application:", error);
+      toast.error("Failed to save interview");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -31,7 +63,7 @@ const Scheduler = () => {
           </div>
           
           <div className="rounded-lg border bg-card shadow-sm p-6 md:p-8">
-            <JobForm onSave={handleSaveJob} />
+            <JobForm onSave={handleSaveJob} isLoading={isLoading} />
           </div>
         </div>
       </main>
