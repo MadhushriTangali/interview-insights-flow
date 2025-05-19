@@ -29,10 +29,13 @@ const Scheduler = () => {
         formData.interviewDate.toISOString() : 
         new Date(formData.interviewDate).toISOString();
       
+      // Ensure user ID is UUID format
+      const userId = user.id.toString();
+      
       const { error } = await supabase
         .from('job_applications')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           company_name: formData.companyName,
           role: formData.role,
           salary_lpa: formData.salaryLPA,

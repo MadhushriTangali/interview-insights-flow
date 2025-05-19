@@ -22,6 +22,12 @@ export function getCurrentUser(): User | null {
 }
 
 export function setCurrentUser(user: User): void {
+  // Ensure that the user ID is a valid UUID if it's a string
+  if (user && typeof user.id === 'string' && !isValidUUID(user.id)) {
+    // Generate a proper UUID for the user
+    user.id = generateUUID();
+  }
+
   const userData = {
     user,
     loginTime: Date.now()
@@ -36,4 +42,20 @@ export function logout(): void {
 
 export function isAuthenticated(): boolean {
   return getCurrentUser() !== null;
+}
+
+// Helper function to check if a string is a valid UUID
+function isValidUUID(id: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+}
+
+// Helper function to generate a UUID
+function generateUUID(): string {
+  // Simple UUID v4 generator
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }

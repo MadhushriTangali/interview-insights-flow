@@ -33,10 +33,13 @@ const Tracker = () => {
         setIsLoading(true);
         setError(null);
         
+        // Ensure user ID is in the correct format
+        const userId = user.id.toString();
+        
         const { data, error } = await supabase
           .from('job_applications')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', userId);
         
         if (error) throw error;
         
@@ -88,7 +91,7 @@ const Tracker = () => {
       
       setJobs(jobs.filter(job => job.id !== id));
       toast.success("Interview deleted successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting job application:", error);
       toast.error("Failed to delete interview");
     }

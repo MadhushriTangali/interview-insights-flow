@@ -1,12 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, Clock, Star, UserCheck, Users } from "lucide-react";
+import { Calendar, CheckCircle, Clock, Star } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { ProgressCircle } from "@/components/dashboard/progress-circle";
-import { RatingChart } from "@/components/dashboard/rating-chart";
 import { UpcomingInterviews } from "@/components/dashboard/upcoming-interviews";
 import { getCurrentUser } from "@/lib/auth";
 import { JobApplication } from "@/types";
@@ -32,10 +30,14 @@ const Dashboard = () => {
     const fetchInterviews = async () => {
       try {
         setLoading(true);
+        
+        // Ensure user ID is in correct format
+        const userId = user.id.toString();
+        
         const { data, error } = await supabase
           .from('job_applications')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', userId);
         
         if (error) throw error;
         
@@ -48,6 +50,7 @@ const Dashboard = () => {
             role: job.role,
             salaryLPA: job.salary_lpa,
             interviewDate: new Date(job.interview_date),
+            interviewTime: job.interview_time,
             status: job.status as "upcoming" | "completed" | "rejected",
             notes: job.notes || "",
             createdAt: new Date(job.created_at),
@@ -58,7 +61,7 @@ const Dashboard = () => {
         } else {
           setJobs([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching interviews:", error);
         toast.error("Failed to load your interviews");
       } finally {
@@ -75,23 +78,6 @@ const Dashboard = () => {
 
   const upcomingInterviews = jobs.filter((job) => job.status === "upcoming");
   const completedInterviews = jobs.filter((job) => job.status === "completed");
-
-  // Mock rating data - only shown if hasRatings is true
-  const averageRating = 3.8;
-  const ratingData = [
-    { name: "Technical", value: 4.2 },
-    { name: "Managerial", value: 3.5 },
-    { name: "Projects", value: 4.0 },
-    { name: "Self-Intro", value: 3.8 },
-    { name: "HR", value: 4.5 },
-    { name: "Dress-up", value: 4.2 },
-    { name: "Communication", value: 3.4 },
-    { name: "Body Language", value: 3.0 },
-    { name: "Punctuality", value: 4.5 },
-  ];
-
-  // Calculate percentage for progress circle
-  const ratingPercentage = Math.round((averageRating / 5) * 100);
 
   // Check if there are any updates to show
   const hasUpdates = jobs.length > 0;
@@ -129,7 +115,7 @@ const Dashboard = () => {
                 {hasRatings ? (
                   <StatCard
                     title="Average Rating"
-                    value={averageRating.toFixed(1)}
+                    value="N/A"
                     icon={<Star className="h-4 w-4 text-yellow-500" />}
                     description="Based on self-evaluations"
                   />
@@ -166,9 +152,6 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Performance Chart - Only show if ratings exist */}
-              {hasRatings && <RatingChart data={ratingData} />}
-              
               {/* Quick Actions */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button 
@@ -183,20 +166,6 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </Button>
-                
-                <Button 
-                  className="h-auto py-4 justify-start"
-                  variant="outline"
-                  onClick={() => navigate("/prep")}
-                >
-                  <div className="flex items-center">
-                    <UserCheck className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-semibold">Interview Prep</div>
-                      <div className="text-xs text-muted-foreground">Practice with sample questions</div>
-                    </div>
-                  </div>
-                </Button>
               </div>
               
               {/* Latest Updates - Only if there are any updates */}
@@ -206,7 +175,7 @@ const Dashboard = () => {
                     <h2 className="text-lg font-semibold mb-4">Latest Updates</h2>
                     
                     <div className="space-y-4">
-                      {jobs.length > 0 && jobs.slice(0, 3).map((job, index) => (
+                      {jobs.length > 0 && jobs.slice(0, 3).map((job) => (
                         <div key={job.id} className="flex items-start gap-4">
                           <div className={`h-10 w-10 rounded-full ${job.status === 'upcoming' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'} flex items-center justify-center`}>
                             {job.status === 'upcoming' ? <Calendar className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
@@ -251,64 +220,6 @@ const Dashboard = () => {
             
             {/* Right Column */}
             <div className="space-y-8">
-              {/* Overall Rating - Only if ratings exist */}
-              {hasRatings && (
-                <div className="rounded-lg border bg-card shadow p-6">
-                  <h2 className="text-lg font-semibold mb-4">Overall Rating</h2>
-                  <div className="flex flex-col items-center justify-center">
-                    <ProgressCircle value={ratingPercentage} size={150} strokeWidth={12} className="mb-4">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold">{averageRating.toFixed(1)}</div>
-                        <div className="text-xs text-muted-foreground">out of 5</div>
-                      </div>
-                    </ProgressCircle>
-                    
-                    <div className="w-full mt-4">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">Technical Skills</span>
-                        <span className="text-sm text-muted-foreground">4.2/5</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="progress-bar-gradient h-2 rounded-full" 
-                          style={{ width: `${(4.2 / 5) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    <div className="w-full mt-4">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">Communication</span>
-                        <span className="text-sm text-muted-foreground">3.4/5</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="progress-bar-gradient h-2 rounded-full" 
-                          style={{ width: `${(3.4 / 5) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    <div className="w-full mt-4">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium">HR Round</span>
-                        <span className="text-sm text-muted-foreground">4.5/5</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="progress-bar-gradient h-2 rounded-full" 
-                          style={{ width: `${(4.5 / 5) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    
-                    <Button variant="outline" className="w-full mt-6" onClick={() => navigate("/feedback")}>
-                      View Detailed Analysis
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
               {/* Upcoming Interviews - Only show if there are upcoming interviews */}
               {upcomingInterviews.length > 0 && (
                 <UpcomingInterviews interviews={upcomingInterviews} />
