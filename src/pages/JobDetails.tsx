@@ -47,6 +47,12 @@ const JobDetails = () => {
         }
         
         // Transform data to match JobApplication type
+        // Fix: Ensure status is one of the allowed enum values
+        let validStatus: "upcoming" | "completed" | "rejected" = "upcoming";
+        if (data.status === "completed" || data.status === "rejected") {
+          validStatus = data.status as "completed" | "rejected";
+        }
+        
         const transformedJob: JobApplication = {
           id: data.id,
           userId: data.user_id,
@@ -54,8 +60,7 @@ const JobDetails = () => {
           role: data.role,
           salaryLPA: data.salary_lpa,
           interviewDate: new Date(data.interview_date),
-          interviewTime: data.interview_time,
-          status: data.status,
+          status: validStatus,
           notes: data.notes || "",
           createdAt: new Date(data.created_at),
           updatedAt: new Date(data.updated_at)
@@ -162,20 +167,12 @@ const JobDetails = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card className="p-4 flex items-center gap-3">
               <Calendar className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">Interview Date</p>
                 <p className="font-medium">{format(job.interviewDate, "PPP")}</p>
-              </div>
-            </Card>
-            
-            <Card className="p-4 flex items-center gap-3">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Interview Time</p>
-                <p className="font-medium">{job.interviewTime}</p>
               </div>
             </Card>
             
