@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -319,7 +320,7 @@ const ProfilePage = () => {
               </CardContent>
             </Card>
             
-            {/* Account Security */}
+            {/* Account Security - Fixed to use Label instead of FormLabel */}
             <Card>
               <CardHeader>
                 <CardTitle>Account Security</CardTitle>
@@ -331,19 +332,19 @@ const ProfilePage = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <FormLabel>Current Password</FormLabel>
+                      <Label>Current Password</Label>
                       <Input type="password" placeholder="Enter current password" />
                     </div>
                     
                     <div></div>
                     
                     <div className="space-y-2">
-                      <FormLabel>New Password</FormLabel>
+                      <Label>New Password</Label>
                       <Input type="password" placeholder="Enter new password" />
                     </div>
                     
                     <div className="space-y-2">
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <Label>Confirm New Password</Label>
                       <Input type="password" placeholder="Confirm new password" />
                     </div>
                   </div>
