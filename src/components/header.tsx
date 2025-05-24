@@ -27,7 +27,8 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
-import { getCurrentUser, logout } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { logout } from "@/lib/auth";
 
 const navigation = [
   {
@@ -67,16 +68,22 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
-  
-  // Update user on location change
-  useEffect(() => {
-    setUser(getCurrentUser());
-  }, [location.pathname]);
+  const { user, session } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
+  };
+
+  // Get user display name and avatar from Supabase user metadata
+  const getUserDisplayName = () => {
+    if (!user) return "";
+    return user.user_metadata?.name || user.email || "";
+  };
+
+  const getUserAvatar = () => {
+    if (!user) return "";
+    return user.user_metadata?.avatar_url || "";
   };
 
   return (
@@ -132,16 +139,16 @@ export default function Header() {
                     className="relative h-9 w-9 rounded-full"
                   >
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.photoURL || ""} alt={user.name} />
+                      <AvatarImage src={getUserAvatar()} alt={getUserDisplayName()} />
                       <AvatarFallback>
-                        {user.name?.charAt(0).toUpperCase() || "U"}
+                        {getUserDisplayName().charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>
-                    {user.name || user.email}
+                    {getUserDisplayName()}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>

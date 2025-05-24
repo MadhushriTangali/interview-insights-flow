@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { toast } from "sonner";
-import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const profileSchema = z.object({
   name: z.string().min(2, {
@@ -42,17 +41,23 @@ const profileSchema = z.object({
 });
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(getCurrentUser());
+  const { user, session } = useAuth();
   
-  // Update user when component mounts and when location changes
-  useEffect(() => {
-    setUser(getCurrentUser());
-  }, []);
+  // Get user display name and avatar from Supabase user metadata
+  const getUserDisplayName = () => {
+    if (!user) return "";
+    return user.user_metadata?.name || user.email || "";
+  };
+
+  const getUserAvatar = () => {
+    if (!user) return "";
+    return user.user_metadata?.avatar_url || "";
+  };
   
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || "",
+      name: getUserDisplayName(),
       email: user?.email || "",
       phone: "",
       location: "",
@@ -63,7 +68,7 @@ const ProfilePage = () => {
   // Update form values when user changes
   useEffect(() => {
     if (user) {
-      form.setValue("name", user.name || "");
+      form.setValue("name", getUserDisplayName());
       form.setValue("email", user.email || "");
     }
   }, [user, form]);
@@ -131,8 +136,8 @@ const ProfilePage = () => {
                 <div className="flex flex-col md:flex-row gap-8 mb-8">
                   <div className="flex flex-col items-center justify-center space-y-4">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src={user?.photoURL || ""} alt={user?.name || "User"} />
-                      <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                      <AvatarImage src={getUserAvatar()} alt={getUserDisplayName()} />
+                      <AvatarFallback>{getUserDisplayName().charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
                     <Button variant="outline" size="sm">
                       Change Photo

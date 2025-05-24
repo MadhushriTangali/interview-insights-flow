@@ -17,15 +17,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { setCurrentUser } from "@/lib/auth";
-import { User } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 type AuthFormProps = {
   type: "login" | "register" | "forgot";
 };
-
-// Mock user database
-const MOCK_USERS: User[] = [];
 
 export function AuthForm({ type }: AuthFormProps) {
   const navigate = useNavigate();
@@ -67,66 +63,62 @@ export function AuthForm({ type }: AuthFormProps) {
 
     try {
       if (type === "register") {
-        // Mock registration - would be replaced by actual authentication
-        setTimeout(() => {
-          const newUser: User = {
-            id: `user${Math.floor(Math.random() * 10000)}`,
-            name: data.name,
-            email: data.email,
-            createdAt: new Date(),
-          };
-          
-          MOCK_USERS.push(newUser);
-          toast.success("Registration successful! Please log in.");
-          navigate("/login");
-        }, 1500);
+        const { error } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            data: {
+              name: data.name,
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        toast.success("Registration successful! Please check your email to verify your account.");
+        navigate("/login");
       } else if (type === "login") {
-        // Mock login - would be replaced by actual authentication
-        setTimeout(() => {
-          // For demo purposes, we'll just create a mock user
-          const user: User = {
-            id: `user${Math.floor(Math.random() * 10000)}`,
-            name: "Demo User",
-            email: data.email,
-            createdAt: new Date(),
-          };
-          
-          setCurrentUser(user);
-          toast.success("Login successful!");
-          navigate("/dashboard");
-        }, 1500);
+        const { error } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
+        
+        if (error) throw error;
+        
+        toast.success("Login successful!");
+        navigate("/dashboard");
       } else {
-        // Mock forgot password
-        setTimeout(() => {
-          toast.success("Password reset email sent to " + data.email);
-        }, 1500);
+        const { error } = await supabase.auth.resetPasswordForEmail(data.email);
+        
+        if (error) throw error;
+        
+        toast.success("Password reset email sent to " + data.email);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth error:", error);
-      toast.error("Authentication failed. Please try again.");
+      toast.error(error.message || "Authentication failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true);
     
-    // Mock Google sign-in - would be replaced by actual authentication
-    setTimeout(() => {
-      const user: User = {
-        id: `user${Math.floor(Math.random() * 10000)}`,
-        name: "Google User",
-        email: "google.user@example.com",
-        photoURL: "https://lh3.googleusercontent.com/a/default-user",
-        createdAt: new Date(),
-      };
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
       
-      setCurrentUser(user);
-      toast.success("Google sign-in successful!");
-      navigate("/dashboard");
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Google sign-in error:", error);
+      toast.error(error.message || "Google sign-in failed. Please try again.");
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
