@@ -6,18 +6,17 @@ import Footer from "@/components/footer";
 import { JobForm } from "@/components/job/job-form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Scheduler = () => {
   const navigate = useNavigate();
+  const { user, session } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   const handleSaveJob = async (formData: any) => {
-    const user = getCurrentUser();
-    
-    if (!user) {
+    if (!user || !session) {
       toast.error("Please log in to save an interview");
-      navigate("/login");
+      navigate("/auth");
       return;
     }
     
@@ -29,13 +28,10 @@ const Scheduler = () => {
         formData.interviewDate.toISOString() : 
         new Date(formData.interviewDate).toISOString();
       
-      // Ensure user ID is UUID format
-      const userId = user.id.toString();
-      
       const { error } = await supabase
         .from('job_applications')
         .insert({
-          user_id: userId,
+          user_id: user.id,
           company_name: formData.companyName,
           role: formData.role,
           salary_lpa: formData.salaryLPA,

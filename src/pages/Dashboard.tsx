@@ -6,23 +6,26 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { UpcomingInterviews } from "@/components/dashboard/upcoming-interviews";
-import { getCurrentUser } from "@/lib/auth";
 import { JobApplication } from "@/types";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { user, session, loading: authLoading } = useAuth();
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasRatings, setHasRatings] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to load first
+    if (authLoading) return;
+    
     // Redirect if not authenticated
-    if (!user) {
-      navigate("/login");
+    if (!user || !session) {
+      navigate("/auth");
       return;
     }
     
@@ -31,13 +34,10 @@ const Dashboard = () => {
       try {
         setLoading(true);
         
-        // Ensure user ID is in correct format
-        const userId = user.id.toString();
-        
         const { data, error } = await supabase
           .from('job_applications')
           .select('*')
-          .eq('user_id', userId);
+          .eq('user_id', user.id);
         
         if (error) throw error;
         
@@ -74,13 +74,32 @@ const Dashboard = () => {
     // For demo purposes, we're setting hasRatings to false initially
     // In a real app, this would be fetched from a ratings table
     setHasRatings(false);
-  }, [user, navigate]);
+  }, [user, session, authLoading, navigate]);
+
+  // Show loading while auth is loading
+  if (authLoading) {
+    return (
+      <>
+        <Header />
+        <main className="flex-1 py-12">
+          <div className="container max-w-4xl">
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   const upcomingInterviews = jobs.filter((job) => job.status === "upcoming");
   const completedInterviews = jobs.filter((job) => job.status === "completed");
 
   // Check if there are any updates to show
   const hasUpdates = jobs.length > 0;
+
+  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
 
   return (
     <>
@@ -90,7 +109,7 @@ const Dashboard = () => {
         <div className="container px-4 md:px-6">
           {/* Welcome Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h1>
+            <h1 className="text-3xl font-bold">Welcome back, {userName}!</h1>
             <p className="text-muted-foreground">
               Track your job applications and prepare for upcoming interviews
             </p>

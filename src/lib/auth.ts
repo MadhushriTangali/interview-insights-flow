@@ -1,61 +1,41 @@
 
-import { User } from "@/types";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock auth functionality - would be replaced by Firebase/Auth0 or other provider
-const STORAGE_KEY = 'interview_app_user';
-const SESSION_EXPIRY = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
-
+// Updated auth functionality to work with Supabase
 export function getCurrentUser(): User | null {
-  const userJson = localStorage.getItem(STORAGE_KEY);
-  if (!userJson) return null;
-  
-  const userData = JSON.parse(userJson);
-  const loginTime = userData.loginTime || 0;
-  
-  // Check if session expired (4 hours)
-  if (Date.now() - loginTime > SESSION_EXPIRY) {
-    localStorage.removeItem(STORAGE_KEY);
-    return null;
-  }
-  
-  return userData.user;
+  // This function should be used with auth state management
+  // For immediate access, use the session from auth state
+  return null;
 }
 
-export function setCurrentUser(user: User): void {
-  // Ensure that the user ID is a valid UUID if it's a string
-  if (user && typeof user.id === 'string' && !isValidUUID(user.id)) {
-    // Generate a proper UUID for the user
-    user.id = generateUUID();
-  }
-
-  const userData = {
-    user,
-    loginTime: Date.now()
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+export async function getSession(): Promise<Session | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
 }
 
-export function logout(): void {
-  localStorage.removeItem(STORAGE_KEY);
+export async function logout(): Promise<void> {
+  await supabase.auth.signOut();
   window.location.href = "/";
 }
 
 export function isAuthenticated(): boolean {
-  return getCurrentUser() !== null;
+  // This should be used with auth state management
+  // For immediate access, check if session exists
+  return false;
 }
 
-// Helper function to check if a string is a valid UUID
-function isValidUUID(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
+// Helper function to get user ID from session
+export function getUserId(session: Session | null): string | null {
+  return session?.user?.id || null;
 }
 
-// Helper function to generate a UUID
-function generateUUID(): string {
-  // Simple UUID v4 generator
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+// Helper function to get user data from session
+export function getUserData(session: Session | null): { name?: string; email?: string } | null {
+  if (!session?.user) return null;
+  
+  return {
+    name: session.user.user_metadata?.name || session.user.email,
+    email: session.user.email || '',
+  };
 }

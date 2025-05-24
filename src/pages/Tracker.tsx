@@ -10,36 +10,35 @@ import { JobCard } from "@/components/job/job-card";
 import { JobApplication } from "@/types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Tracker = () => {
   const navigate = useNavigate();
+  const { user, session, loading: authLoading } = useAuth();
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
+    // Wait for auth to load first
+    if (authLoading) return;
+    
+    if (!user || !session) {
+      toast.error("Please log in to view your interviews");
+      navigate("/auth");
+      return;
+    }
+    
     const fetchJobs = async () => {
-      const user = getCurrentUser();
-      
-      if (!user) {
-        toast.error("Please log in to view your interviews");
-        navigate("/login");
-        return;
-      }
-      
       try {
         setIsLoading(true);
         setError(null);
         
-        // Ensure user ID is in the correct format
-        const userId = user.id.toString();
-        
         const { data, error } = await supabase
           .from('job_applications')
           .select('*')
-          .eq('user_id', userId);
+          .eq('user_id', user.id);
         
         if (error) throw error;
         
@@ -73,7 +72,7 @@ const Tracker = () => {
     };
     
     fetchJobs();
-  }, [navigate]);
+  }, [user, session, authLoading, navigate]);
   
   // Filter jobs based on status
   const filteredJobs = filter === "all" 
@@ -96,6 +95,23 @@ const Tracker = () => {
       toast.error("Failed to delete interview");
     }
   };
+
+  // Show loading while auth is loading
+  if (authLoading) {
+    return (
+      <>
+        <Header />
+        <main className="flex-1 py-12">
+          <div className="container max-w-4xl">
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
   
   return (
     <>
