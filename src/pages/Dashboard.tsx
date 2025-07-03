@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle, Clock, Star } from "lucide-react";
@@ -11,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useInterviewCleanup } from "@/hooks/useInterviewCleanup";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,31 +19,27 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [hasRatings, setHasRatings] = useState(false);
 
-  useEffect(() => {
-    // Wait for auth to load first
-    if (authLoading) return;
+  const fetchInterviews = async () => {
+    if (!user || !session) return;
     
-    // Redirect if not authenticated
-    if (!user || !session) {
-      navigate("/auth");
-      return;
-    }
-    
-    // Fetch user's interviews
-    const fetchInterviews = async () => {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('job_applications')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Filter out past interviews (older than 24 hours)
+        const now = new Date();
+        const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         
-        const { data, error } = await supabase
-          .from('job_applications')
-          .select('*')
-          .eq('user_id', user.id);
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          // Transform data to match JobApplication type
-          const transformedData: JobApplication[] = data.map(job => ({
+        const transformedData: JobApplication[] = data
+          .filter(job => new Date(job.interview_date) > cutoffTime)
+          .map(job => ({
             id: job.id,
             userId: job.user_id,
             companyName: job.company_name,
@@ -56,18 +52,31 @@ const Dashboard = () => {
             createdAt: new Date(job.created_at),
             updatedAt: new Date(job.updated_at)
           }));
-          
-          setJobs(transformedData);
-        } else {
-          setJobs([]);
-        }
-      } catch (error: any) {
-        console.error("Error fetching interviews:", error);
-        toast.error("Failed to load your interviews");
-      } finally {
-        setLoading(false);
+        
+        setJobs(transformedData);
+      } else {
+        setJobs([]);
       }
-    };
+    } catch (error: any) {
+      console.error("Error fetching interviews:", error);
+      toast.error("Failed to load your interviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use the cleanup hook to refresh data when interviews are removed
+  useInterviewCleanup(fetchInterviews);
+
+  useEffect(() => {
+    // Wait for auth to load first
+    if (authLoading) return;
+    
+    // Redirect if not authenticated
+    if (!user || !session) {
+      navigate("/auth");
+      return;
+    }
     
     fetchInterviews();
     
@@ -76,7 +85,6 @@ const Dashboard = () => {
     setHasRatings(false);
   }, [user, session, authLoading, navigate]);
 
-  // Show loading while auth is loading
   if (authLoading) {
     return (
       <>
@@ -241,7 +249,7 @@ const Dashboard = () => {
             <div className="space-y-8">
               {/* Upcoming Interviews - Only show if there are upcoming interviews */}
               {upcomingInterviews.length > 0 && (
-                <UpcomingInterviews interviews={upcomingInterviews} />
+                <UpcomingInterviews interviews={upcomingInterviews} onRefresh={fetchInterviews} />
               )}
               
               {upcomingInterviews.length === 0 && !loading && (
