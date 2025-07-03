@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { JobApplication } from "@/types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useInterviewCleanup } from "@/hooks/useInterviewCleanup";
 
 const Tracker = () => {
   const navigate = useNavigate();
@@ -19,6 +19,52 @@ const Tracker = () => {
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const fetchJobs = async () => {
+    if (!user || !session) return;
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase
+        .from('job_applications')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Transform data to match JobApplication type
+        const transformedData: JobApplication[] = data.map(job => ({
+          id: job.id,
+          userId: job.user_id,
+          companyName: job.company_name,
+          role: job.role,
+          salaryLPA: job.salary_lpa,
+          interviewDate: new Date(job.interview_date),
+          interviewTime: job.interview_time,
+          status: job.status as "upcoming" | "completed" | "rejected",
+          notes: job.notes || "",
+          createdAt: new Date(job.created_at),
+          updatedAt: new Date(job.updated_at)
+        }));
+        
+        setJobs(transformedData);
+      } else {
+        setJobs([]);
+      }
+    } catch (error: any) {
+      console.error("Error fetching job applications:", error);
+      setError(error.message || "Failed to load your interviews");
+      toast.error("Failed to load your interviews");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Use the cleanup hook to refresh data when interviews are removed
+  useInterviewCleanup(fetchJobs);
   
   useEffect(() => {
     // Wait for auth to load first
@@ -29,47 +75,6 @@ const Tracker = () => {
       navigate("/auth");
       return;
     }
-    
-    const fetchJobs = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const { data, error } = await supabase
-          .from('job_applications')
-          .select('*')
-          .eq('user_id', user.id);
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          // Transform data to match JobApplication type
-          const transformedData: JobApplication[] = data.map(job => ({
-            id: job.id,
-            userId: job.user_id,
-            companyName: job.company_name,
-            role: job.role,
-            salaryLPA: job.salary_lpa,
-            interviewDate: new Date(job.interview_date),
-            interviewTime: job.interview_time,
-            status: job.status as "upcoming" | "completed" | "rejected",
-            notes: job.notes || "",
-            createdAt: new Date(job.created_at),
-            updatedAt: new Date(job.updated_at)
-          }));
-          
-          setJobs(transformedData);
-        } else {
-          setJobs([]);
-        }
-      } catch (error: any) {
-        console.error("Error fetching job applications:", error);
-        setError(error.message || "Failed to load your interviews");
-        toast.error("Failed to load your interviews");
-      } finally {
-        setIsLoading(false);
-      }
-    };
     
     fetchJobs();
   }, [user, session, authLoading, navigate]);

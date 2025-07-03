@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar, Clock } from "lucide-react";
 import {
@@ -11,13 +12,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { JobApplication } from "@/types";
 import { useNavigate } from "react-router-dom";
+import { useInterviewCleanup } from "@/hooks/useInterviewCleanup";
 
 interface UpcomingInterviewsProps {
   interviews: JobApplication[];
+  onRefresh?: () => void;
 }
 
-export function UpcomingInterviews({ interviews }: UpcomingInterviewsProps) {
+export function UpcomingInterviews({ interviews, onRefresh }: UpcomingInterviewsProps) {
   const navigate = useNavigate();
+  
+  // Use the cleanup hook to refresh data when interviews are removed
+  useInterviewCleanup(onRefresh);
+  
   const sortedInterviews = [...interviews].sort(
     (a, b) => new Date(a.interviewDate).getTime() - new Date(b.interviewDate).getTime()
   );
