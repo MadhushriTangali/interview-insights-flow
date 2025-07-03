@@ -63,40 +63,69 @@ export function AuthForm({ type }: AuthFormProps) {
 
     try {
       if (type === "register") {
-        const { error } = await supabase.auth.signUp({
+        // Fixed sign up with proper error handling and redirect URL
+        const { data: authData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
           options: {
             data: {
               name: data.name,
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/dashboard`
           }
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Sign up error:", error);
+          throw error;
+        }
         
-        toast.success("Registration successful! Please check your email to verify your account.");
-        navigate("/login");
+        if (authData.user && !authData.session) {
+          toast.success("Registration successful! Please check your email to verify your account.");
+        } else if (authData.session) {
+          toast.success("Registration successful! You're now logged in.");
+          navigate("/dashboard");
+        }
       } else if (type === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
           email: data.email,
           password: data.password,
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Login error:", error);
+          throw error;
+        }
         
         toast.success("Login successful!");
         navigate("/dashboard");
       } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(data.email);
+        const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+          redirectTo: `${window.location.origin}/auth`
+        });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Password reset error:", error);
+          throw error;
+        }
         
         toast.success("Password reset email sent to " + data.email);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
-      toast.error(error.message || "Authentication failed. Please try again.");
+      
+      // Handle specific error types
+      if (error.message?.includes("User already registered")) {
+        toast.error("An account with this email already exists. Please sign in instead.");
+      } else if (error.message?.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Please check your credentials.");
+      } else if (error.message?.includes("Email not confirmed")) {
+        toast.error("Please check your email and confirm your account before signing in.");
+      } else if (error.message?.includes("Failed to fetch")) {
+        toast.error("Network error. Please check your internet connection and try again.");
+      } else {
+        toast.error(error.message || "Authentication failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +142,10 @@ export function AuthForm({ type }: AuthFormProps) {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Google sign-in error:", error);
+        throw error;
+      }
     } catch (error: any) {
       console.error("Google sign-in error:", error);
       toast.error(error.message || "Google sign-in failed. Please try again.");

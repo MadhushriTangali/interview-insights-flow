@@ -75,6 +75,15 @@ export default function Header() {
     navigate("/");
   };
 
+  // Fixed theme toggle function
+  const toggleTheme = () => {
+    if (theme === "dark") {
+      setTheme("light");
+    } else {
+      setTheme("dark");
+    }
+  };
+
   // Get user display name and avatar from Supabase user metadata
   const getUserDisplayName = () => {
     if (!user) return "";
@@ -118,11 +127,11 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <div className="flex flex-1 items-center justify-end md:justify-end">
           <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
+            {/* Fixed Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={toggleTheme}
               className="mr-1"
             >
               <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
