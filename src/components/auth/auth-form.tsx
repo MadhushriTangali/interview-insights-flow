@@ -26,6 +26,7 @@ type AuthFormProps = {
 export function AuthForm({ type }: AuthFormProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Define schema based on form type
   let formSchema;
@@ -63,7 +64,7 @@ export function AuthForm({ type }: AuthFormProps) {
 
     try {
       if (type === "register") {
-        // Fixed sign up with proper error handling and redirect URL
+        // Enhanced sign up with proper error handling and redirect URL
         const { data: authData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
@@ -94,6 +95,10 @@ export function AuthForm({ type }: AuthFormProps) {
         
         if (error) {
           console.error("Login error:", error);
+          // Show forgot password option on failed login
+          if (error.message?.includes("Invalid login credentials")) {
+            setShowForgotPassword(true);
+          }
           throw error;
         }
         
@@ -101,7 +106,7 @@ export function AuthForm({ type }: AuthFormProps) {
         navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-          redirectTo: `${window.location.origin}/auth`
+          redirectTo: `${window.location.origin}/reset-password`
         });
         
         if (error) {
@@ -114,7 +119,7 @@ export function AuthForm({ type }: AuthFormProps) {
     } catch (error: any) {
       console.error("Auth error:", error);
       
-      // Handle specific error types
+      // Enhanced error handling
       if (error.message?.includes("User already registered")) {
         toast.error("An account with this email already exists. Please sign in instead.");
       } else if (error.message?.includes("Invalid login credentials")) {
@@ -230,6 +235,25 @@ export function AuthForm({ type }: AuthFormProps) {
               </Button>
             </div>
           )}
+
+          {/* Show forgot password button after failed login */}
+          {type === "login" && showForgotPassword && (
+            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-3">
+              <p className="text-sm text-red-700 dark:text-red-300 mb-2">
+                Having trouble logging in?
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate("/forgot-password")}
+                type="button"
+                disabled={isLoading}
+                className="w-full"
+              >
+                Reset Password
+              </Button>
+            </div>
+          )}
           
           <Button 
             type="submit" 
@@ -244,27 +268,31 @@ export function AuthForm({ type }: AuthFormProps) {
         </form>
       </Form>
       
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-      
-      <Button 
-        variant="outline" 
-        type="button" 
-        className="w-full" 
-        onClick={handleGoogleSignIn} 
-        disabled={isLoading}
-      >
-        {isLoading ? <Loader className="mr-2" size="sm" /> : null}
-        Google
-      </Button>
+      {type !== "forgot" && (
+        <>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            type="button" 
+            className="w-full" 
+            onClick={handleGoogleSignIn} 
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader className="mr-2" size="sm" /> : null}
+            Google
+          </Button>
+        </>
+      )}
       
       {type === "login" ? (
         <p className="text-center text-sm text-muted-foreground">

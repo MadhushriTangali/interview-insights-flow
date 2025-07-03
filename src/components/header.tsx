@@ -77,11 +77,7 @@ export default function Header() {
 
   // Fixed theme toggle function
   const toggleTheme = () => {
-    if (theme === "dark") {
-      setTheme("light");
-    } else {
-      setTheme("dark");
-    }
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   // Get user display name and avatar from Supabase user metadata
@@ -127,16 +123,16 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <div className="flex flex-1 items-center justify-end md:justify-end">
           <div className="flex items-center gap-2">
-            {/* Fixed Theme Toggle */}
+            {/* Theme Toggle - Now always visible */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
               className="mr-1"
+              aria-label="Toggle theme"
             >
               <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
             </Button>
 
             {/* User Menu (if logged in) */}
