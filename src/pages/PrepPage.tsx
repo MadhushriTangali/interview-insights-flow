@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search } from "lucide-react";
+import { Search, BookOpen, Brain, Target, Lightbulb } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { toast } from "sonner";
@@ -245,43 +245,94 @@ const PrepPage = () => {
     <>
       <Header />
       
-      <main className="flex-1 py-8">
+      <main className="flex-1 py-12 bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-indigo-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-indigo-950/20 min-h-screen">
         <div className="container px-4 md:px-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Interview Preparation</h1>
-            <p className="text-muted-foreground">
-              Find questions and answers to prepare for your upcoming interviews
+          {/* Hero Section */}
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white shadow-xl">
+                <Brain className="h-12 w-12" />
+              </div>
+            </div>
+            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Interview Preparation
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Master your interviews with AI-powered questions and expert answers tailored to your target company and role.
             </p>
+          </div>
+
+          {/* Features Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="flex items-center gap-4 p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">Curated Questions</h3>
+                <p className="text-sm text-muted-foreground">Industry-specific content</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-blue-200/50 dark:border-blue-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+                <Target className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">Targeted Practice</h3>
+                <p className="text-sm text-muted-foreground">Company & role specific</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-indigo-200/50 dark:border-indigo-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
+                <Lightbulb className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">Expert Insights</h3>
+                <p className="text-sm text-muted-foreground">Professional guidance</p>
+              </div>
+            </div>
           </div>
           
           {/* Search Section */}
-          <Card className="mb-8">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="mb-12 border-gradient-to-r from-purple-200/50 via-blue-200/50 to-indigo-200/50 dark:from-purple-800/50 dark:via-blue-800/50 dark:to-indigo-800/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-xl">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                Generate Custom Questions
+              </CardTitle>
+              <CardDescription className="text-lg text-muted-foreground">
+                Enter your target company and role to get personalized interview questions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-1">
-                  <label className="block text-sm font-medium mb-1">Company Name</label>
+                  <label className="block text-base font-semibold mb-3 text-gray-800 dark:text-gray-200">Company Name</label>
                   <Input 
-                    placeholder="e.g. Google, Microsoft" 
+                    placeholder="e.g. Google, Microsoft, Apple" 
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
+                    className="h-12 text-base rounded-xl border-2 border-purple-200/50 dark:border-purple-800/50 focus:border-purple-500 dark:focus:border-purple-400"
                   />
                 </div>
                 <div className="md:col-span-1">
-                  <label className="block text-sm font-medium mb-1">Job Role</label>
+                  <label className="block text-base font-semibold mb-3 text-gray-800 dark:text-gray-200">Job Role</label>
                   <Input 
-                    placeholder="e.g. Frontend Developer" 
+                    placeholder="e.g. Frontend Developer, Data Scientist" 
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
+                    className="h-12 text-base rounded-xl border-2 border-purple-200/50 dark:border-purple-800/50 focus:border-purple-500 dark:focus:border-purple-400"
                   />
                 </div>
                 <div className="md:col-span-1 flex items-end">
                   <Button 
-                    className="w-full" 
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl" 
                     onClick={handleSearch}
                     disabled={isLoading}
                   >
                     {isLoading ? "Generating..." : "Generate Questions"}
-                    {!isLoading && <Search className="ml-2 h-4 w-4" />}
+                    {!isLoading && <Search className="ml-3 h-5 w-5" />}
                   </Button>
                 </div>
               </div>
@@ -291,10 +342,10 @@ const PrepPage = () => {
           {/* Questions Section */}
           {questions.length > 0 && (
             <>
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl font-semibold">
-                    Top Questions
+                  <h2 className="text-4xl font-bold mb-2 text-gray-800 dark:text-gray-200">
+                    Interview Questions
                     {company && role 
                       ? ` for ${role} at ${company}` 
                       : company 
@@ -303,25 +354,29 @@ const PrepPage = () => {
                           ? ` for ${role} position` 
                           : ''}
                   </h2>
-                  <p className="text-muted-foreground">
-                    {filteredQuestions.length} questions to help you prepare
+                  <p className="text-lg text-muted-foreground">
+                    {filteredQuestions.length} expertly crafted questions to boost your confidence
                   </p>
                 </div>
                 
-                <div className="mt-4 md:mt-0 w-full md:w-auto">
+                <div className="mt-6 md:mt-0 w-full md:w-auto">
                   <Input
                     placeholder="Search questions..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="md:w-[250px]"
+                    className="md:w-[300px] h-12 text-base rounded-xl border-2 border-purple-200/50 dark:border-purple-800/50 focus:border-purple-500 dark:focus:border-purple-400"
                   />
                 </div>
               </div>
               
-              <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveCategory}>
-                <TabsList className="w-full md:w-auto grid grid-cols-2 md:flex md:flex-row gap-2">
+              <Tabs defaultValue="all" className="mb-8" onValueChange={setActiveCategory}>
+                <TabsList className="w-full md:w-auto grid grid-cols-2 md:flex md:flex-row gap-2 h-14 p-1 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
                   {Object.entries(categoryLabels).map(([key, label]) => (
-                    <TabsTrigger key={key} value={key} className="flex-1 md:flex-none">
+                    <TabsTrigger 
+                      key={key} 
+                      value={key} 
+                      className="flex-1 md:flex-none text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white px-6 py-3"
+                    >
                       {label}
                     </TabsTrigger>
                   ))}
@@ -329,33 +384,44 @@ const PrepPage = () => {
               </Tabs>
               
               {filteredQuestions.length > 0 ? (
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion type="single" collapsible className="w-full space-y-4">
                   {filteredQuestions.map((q) => (
-                    <AccordionItem key={q.id} value={q.id}>
-                      <AccordionTrigger className="text-left">
-                        <div className="flex items-start">
-                          <span className="mr-2">{q.question}</span>
-                          <Badge variant="outline" className="ml-auto">
-                            {q.type.charAt(0).toUpperCase() + q.type.slice(1)}
+                    <AccordionItem 
+                      key={q.id} 
+                      value={q.id}
+                      className="border-2 border-purple-200/50 dark:border-purple-800/50 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 px-6"
+                    >
+                      <AccordionTrigger className="text-left py-6 hover:no-underline">
+                        <div className="flex items-start justify-between w-full">
+                          <span className="mr-4 text-lg font-semibold text-gray-800 dark:text-gray-200 leading-relaxed">{q.question}</span>
+                          <Badge 
+                            variant="outline" 
+                            className="ml-auto shrink-0 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 font-semibold px-3 py-1"
+                          >
+                            {q.type.charAt(0).toUpperCase() + q.type.slice(1).replace('-', ' ')}
                           </Badge>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <div className="p-4 bg-muted/30 rounded-md">
-                          {q.answer}
+                        <div className="p-6 bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl border border-purple-200/30 dark:border-purple-800/30 mt-4">
+                          <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{q.answer}</p>
                         </div>
                       </AccordionContent>
                     </AccordionItem>
                   ))}
                 </Accordion>
               ) : (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <p className="mb-2">No questions found matching your search.</p>
-                    <Button variant="outline" onClick={() => {
-                      setSearchQuery("");
-                      setActiveCategory("all");
-                    }}>
+                <Card className="border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg">
+                  <CardContent className="p-12 text-center">
+                    <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">No questions found matching your search.</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSearchQuery("");
+                        setActiveCategory("all");
+                      }}
+                      className="border-2 border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 px-6 py-3 text-base font-semibold rounded-xl"
+                    >
                       Clear Filters
                     </Button>
                   </CardContent>
@@ -366,24 +432,25 @@ const PrepPage = () => {
           )}
           
           {!isLoading && questions.length === 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Start Your Interview Preparation</CardTitle>
-                <CardDescription>
-                  Enter a company name and job role to get customized interview questions
+            <Card className="border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-2xl">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                  Start Your Interview Preparation
+                </CardTitle>
+                <CardDescription className="text-lg text-muted-foreground">
+                  Enter a company name and job role to get customized interview questions and expert guidance
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col items-center text-center py-6">
-                  <div className="rounded-full bg-muted p-6 mb-4">
-                    <Search className="h-8 w-8 text-muted-foreground" />
+                <div className="flex flex-col items-center text-center py-12">
+                  <div className="rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 p-8 mb-6">
+                    <Search className="h-16 w-16 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    No Questions Generated Yet
+                  <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-200">
+                    Ready to Ace Your Interview?
                   </h3>
-                  <p className="text-muted-foreground max-w-md mb-6">
-                    Enter a company name or job role above to get AI-generated interview questions
-                    and preparation tips.
+                  <p className="text-lg text-muted-foreground max-w-md mb-8 leading-relaxed">
+                    Generate personalized interview questions and get expert tips tailored to your dream job and company.
                   </p>
                 </div>
               </CardContent>
@@ -391,8 +458,8 @@ const PrepPage = () => {
           )}
           
           {isLoading && (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-gradient-to-r from-purple-600 to-blue-600 border-t-transparent"></div>
             </div>
           )}
         </div>

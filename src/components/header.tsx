@@ -93,20 +93,20 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg">
-      <div className="container flex h-16 items-center">
+    <header className="sticky top-0 z-40 w-full border-b border-gradient-to-r from-purple-200 via-blue-200 to-indigo-200 dark:from-purple-800 dark:via-blue-800 dark:to-indigo-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xl">
+      <div className="container flex h-18 items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-bold group">
-          <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white group-hover:scale-110 transition-transform">
-            <Zap className="h-5 w-5" />
+        <Link to="/" className="flex items-center gap-3 font-bold group">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white group-hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-purple-400/50">
+            <Zap className="h-6 w-6" />
           </div>
-          <span className="text-xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Unstoppable
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:ml-10 md:flex md:items-center md:gap-4 md:space-x-4 lg:space-x-6">
+        <nav className="hidden md:ml-12 md:flex md:items-center md:gap-6 md:space-x-6 lg:space-x-8">
           {navigation
             .filter((item) => !item.hidden && (!item.requireAuth || user))
             .map((item) => (
@@ -114,15 +114,15 @@ export default function Header() {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-sm font-medium transition-all duration-200 hover:text-purple-600 dark:hover:text-purple-400 relative group",
+                  "text-base font-semibold transition-all duration-300 hover:text-purple-600 dark:hover:text-purple-400 relative group py-2 px-1",
                   location.pathname === item.href
                     ? "text-purple-600 dark:text-purple-400"
-                    : "text-foreground/70"
+                    : "text-foreground/80 hover:text-foreground"
                 )}
               >
                 {item.name}
                 <span className={cn(
-                  "absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-200 group-hover:w-full",
+                  "absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 transition-all duration-300 group-hover:w-full rounded-full",
                   location.pathname === item.href ? "w-full" : ""
                 )} />
               </Link>
@@ -131,13 +131,13 @@ export default function Header() {
 
         {/* Mobile Menu Button */}
         <div className="flex flex-1 items-center justify-end md:justify-end">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Theme Toggle - Now always visible */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="mr-1 hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors"
+              className="mr-2 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900 dark:hover:to-blue-900 transition-all duration-300 rounded-xl h-11 w-11"
               aria-label="Toggle theme"
             >
               <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-yellow-500" />
@@ -150,50 +150,50 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-9 w-9 rounded-full hover:ring-2 hover:ring-purple-500 hover:ring-offset-2 transition-all"
+                    className="relative h-11 w-11 rounded-full hover:ring-2 hover:ring-purple-500 hover:ring-offset-2 transition-all duration-300 hover:shadow-lg"
                   >
-                    <Avatar className="h-9 w-9">
+                    <Avatar className="h-11 w-11 border-2 border-gradient-to-r from-purple-400 to-blue-400">
                       <AvatarImage src={getUserAvatar()} alt={getUserDisplayName()} />
-                      <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                      <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-lg">
                         {getUserDisplayName().charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border border-purple-200 dark:border-purple-800">
-                  <DropdownMenuLabel className="text-purple-700 dark:text-purple-300">
+                <DropdownMenuContent align="end" className="w-64 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border border-purple-200 dark:border-purple-800 shadow-xl rounded-xl">
+                  <DropdownMenuLabel className="text-purple-700 dark:text-purple-300 font-semibold text-base py-3">
                     {getUserDisplayName()}
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-purple-200 dark:bg-purple-800" />
+                  <DropdownMenuSeparator className="bg-gradient-to-r from-purple-200 to-blue-200 dark:from-purple-800 dark:to-blue-800" />
                   <DropdownMenuGroup>
                     <DropdownMenuItem 
                       onClick={() => navigate("/profile")}
-                      className="hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
+                      className="hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-900 dark:hover:to-blue-900 transition-all duration-200 py-3 text-base rounded-lg m-1"
                     >
-                      <User className="mr-2 h-4 w-4 text-purple-600" />
+                      <User className="mr-3 h-5 w-5 text-purple-600" />
                       Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => navigate("/dashboard")}
-                      className="hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
+                      className="hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-900 dark:hover:to-blue-900 transition-all duration-200 py-3 text-base rounded-lg m-1"
                     >
-                      <Calendar className="mr-2 h-4 w-4 text-purple-600" />
+                      <Calendar className="mr-3 h-5 w-5 text-purple-600" />
                       Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => navigate("/feedback")}
-                      className="hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
+                      className="hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-900 dark:hover:to-blue-900 transition-all duration-200 py-3 text-base rounded-lg m-1"
                     >
-                      <Settings className="mr-2 h-4 w-4 text-purple-600" />
+                      <Settings className="mr-3 h-5 w-5 text-purple-600" />
                       Settings
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
-                  <DropdownMenuSeparator className="bg-purple-200 dark:bg-purple-800" />
+                  <DropdownMenuSeparator className="bg-gradient-to-r from-purple-200 to-blue-200 dark:from-purple-800 dark:to-blue-800" />
                   <DropdownMenuItem 
                     onClick={handleLogout}
-                    className="hover:bg-red-50 dark:hover:bg-red-900 text-red-600 transition-colors"
+                    className="hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 dark:hover:from-red-900 dark:hover:to-pink-900 text-red-600 transition-all duration-200 py-3 text-base rounded-lg m-1"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-3 h-5 w-5" />
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -201,9 +201,9 @@ export default function Header() {
             ) : (
               <Button
                 variant="default"
-                size="sm"
+                size="lg"
                 onClick={() => navigate("/login")}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all"
+                className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl px-6 py-3 font-semibold"
               >
                 Sign In
               </Button>
@@ -214,26 +214,26 @@ export default function Header() {
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="md:hidden hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors"
+                  className="md:hidden hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900 dark:hover:to-blue-900 transition-all duration-300 rounded-xl"
                   size="icon"
                   onClick={() => setIsMobileMenuOpen(true)}
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-6 w-6" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="pr-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-l border-purple-200 dark:border-purple-800">
-                <div className="flex flex-col space-y-4 p-4">
+                <div className="flex flex-col space-y-6 p-6">
                   <div className="flex items-center justify-between">
                     <Link
                       to="/"
-                      className="flex items-center gap-2 font-bold group"
+                      className="flex items-center gap-3 font-bold group"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-                        <Zap className="h-5 w-5" />
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white">
+                        <Zap className="h-6 w-6" />
                       </div>
-                      <span className="text-xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      <span className="text-xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
                         Unstoppable
                       </span>
                     </Link>
@@ -241,14 +241,14 @@ export default function Header() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="hover:bg-purple-100 dark:hover:bg-purple-900"
+                      className="hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900 dark:hover:to-blue-900 rounded-xl"
                     >
-                      <X className="h-5 w-5" />
+                      <X className="h-6 w-6" />
                       <span className="sr-only">Close menu</span>
                     </Button>
                   </div>
 
-                  <nav className="flex flex-col space-y-2">
+                  <nav className="flex flex-col space-y-3">
                     {navigation
                       .filter((item) => !item.hidden && (!item.requireAuth || user))
                       .map((item) => (
@@ -256,10 +256,10 @@ export default function Header() {
                           key={item.name}
                           to={item.href}
                           className={cn(
-                            "flex py-3 px-4 text-base font-medium transition-colors hover:bg-purple-50 dark:hover:bg-purple-900 rounded-lg",
+                            "flex py-4 px-5 text-lg font-semibold transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-900 dark:hover:to-blue-900 rounded-xl",
                             location.pathname === item.href
-                              ? "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900"
-                              : "text-foreground/70"
+                              ? "text-purple-600 bg-gradient-to-r from-purple-50 to-blue-50 dark:text-purple-400 dark:from-purple-900 dark:to-blue-900"
+                              : "text-foreground/80"
                           )}
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
@@ -268,7 +268,7 @@ export default function Header() {
                       ))}
                   </nav>
 
-                  <div className="flex flex-col space-y-2 pt-4 border-t border-purple-200 dark:border-purple-800">
+                  <div className="flex flex-col space-y-3 pt-6 border-t border-gradient-to-r from-purple-200 to-blue-200 dark:from-purple-800 dark:to-blue-800">
                     {!user && (
                       <Button
                         variant="default"
@@ -276,7 +276,7 @@ export default function Header() {
                           navigate("/login");
                           setIsMobileMenuOpen(false);
                         }}
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white py-3 text-lg font-semibold rounded-xl"
                       >
                         Sign In
                       </Button>
@@ -288,7 +288,7 @@ export default function Header() {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 py-3 text-lg font-semibold rounded-xl"
                       >
                         Log Out
                       </Button>
