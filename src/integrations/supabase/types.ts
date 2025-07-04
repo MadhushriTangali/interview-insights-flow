@@ -41,6 +41,71 @@ export type Database = {
           },
         ]
       }
+      interview_ratings: {
+        Row: {
+          body_language: number
+          communication: number
+          created_at: string
+          dressup: number
+          feedback: string | null
+          hr_round: number
+          id: string
+          job_application_id: string
+          managerial: number
+          overall_rating: number
+          projects: number
+          punctuality: number
+          self_introduction: number
+          technical: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_language: number
+          communication: number
+          created_at?: string
+          dressup: number
+          feedback?: string | null
+          hr_round: number
+          id?: string
+          job_application_id: string
+          managerial: number
+          overall_rating: number
+          projects: number
+          punctuality: number
+          self_introduction: number
+          technical: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_language?: number
+          communication?: number
+          created_at?: string
+          dressup?: number
+          feedback?: string | null
+          hr_round?: number
+          id?: string
+          job_application_id?: string
+          managerial?: number
+          overall_rating?: number
+          projects?: number
+          punctuality?: number
+          self_introduction?: number
+          technical?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_ratings_job_application_id_fkey"
+            columns: ["job_application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           company_name: string

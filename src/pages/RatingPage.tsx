@@ -72,10 +72,11 @@ const ratingSchema = z.object({
 
 const RatingPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Changed from jobId to id to match the route
+  const { id } = useParams();
   const { user } = useAuth();
   const [job, setJob] = useState<JobApplication | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   
   useEffect(() => {
     const fetchJob = async () => {
@@ -136,9 +137,11 @@ const RatingPage = () => {
   });
   
   const onSubmit = async (data: z.infer<typeof ratingSchema>) => {
-    if (!job) return;
+    if (!job || !user) return;
     
     try {
+      setSubmitting(true);
+      
       // Calculate overall rating
       const ratingValues = [
         data.technical,
@@ -155,21 +158,42 @@ const RatingPage = () => {
       const overallRating = 
         ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length;
       
+      // Save rating to database
+      const { error: ratingError } = await supabase
+        .from('interview_ratings')
+        .insert({
+          job_application_id: job.id,
+          user_id: user.id,
+          technical: data.technical,
+          managerial: data.managerial,
+          projects: data.projects,
+          self_introduction: data.selfIntroduction,
+          hr_round: data.hrRound,
+          dressup: data.dressup,
+          communication: data.communication,
+          body_language: data.bodyLanguage,
+          punctuality: data.punctuality,
+          overall_rating: parseFloat(overallRating.toFixed(2)),
+          feedback: data.feedback || null
+        });
+        
+      if (ratingError) throw ratingError;
+      
       // Update job status to completed
-      const { error } = await supabase
+      const { error: jobError } = await supabase
         .from('job_applications')
         .update({ status: 'completed' })
         .eq('id', job.id);
         
-      if (error) throw error;
-      
-      console.log("Rating submitted:", { ...data, overallRating: overallRating.toFixed(1) });
+      if (jobError) throw jobError;
       
       toast.success("Rating submitted successfully!");
-      navigate("/tracker");
-    } catch (error) {
+      navigate("/ratings");
+    } catch (error: any) {
       console.error("Error submitting rating:", error);
-      toast.error("Failed to submit rating");
+      toast.error("Failed to submit rating: " + error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
   
@@ -223,7 +247,7 @@ const RatingPage = () => {
               Rate Your Interview
             </h1>
             <p className="text-muted-foreground text-lg">
-              {job.companyName} - {job.role}
+              {job?.companyName} - {job?.role}
             </p>
           </div>
           
@@ -453,14 +477,16 @@ const RatingPage = () => {
                       variant="outline"
                       onClick={() => navigate("/tracker")}
                       className="px-8 py-3 text-lg"
+                      disabled={submitting}
                     >
                       Cancel
                     </Button>
                     <Button 
                       type="submit" 
                       className="px-8 py-3 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      disabled={submitting}
                     >
-                      Submit Rating
+                      {submitting ? "Submitting..." : "Submit Rating"}
                     </Button>
                   </div>
                 </form>

@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle, Clock, Star, Zap, TrendingUp } from "lucide-react";
+import { Calendar, CheckCircle, Clock, Star, Zap, TrendingUp, BarChart3 } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -12,13 +11,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInterviewCleanup } from "@/hooks/useInterviewCleanup";
+import { useRatings } from "@/hooks/useRatings";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, session, loading: authLoading } = useAuth();
   const [jobs, setJobs] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasRatings, setHasRatings] = useState(false);
+  const { overallAverage, hasRatings, loading: ratingsLoading } = useRatings();
 
   const fetchInterviews = async () => {
     if (!user || !session) return;
@@ -83,7 +83,6 @@ const Dashboard = () => {
     
     // For demo purposes, we're setting hasRatings to false initially
     // In a real app, this would be fetched from a ratings table
-    setHasRatings(false);
   }, [user, session, authLoading, navigate]);
 
   if (authLoading) {
@@ -176,7 +175,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Performance Rating</p>
                       <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-300">
-                        {hasRatings ? "N/A" : "N/A"}
+                        {!ratingsLoading && hasRatings ? overallAverage.toFixed(1) : "N/A"}
                       </p>
                     </div>
                     <div className="p-3 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg">
@@ -248,6 +247,23 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </Button>
+
+                {hasRatings && (
+                  <Button 
+                    className="h-auto py-6 justify-start bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                    onClick={() => navigate("/ratings")}
+                  >
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-lg bg-white/20 mr-4">
+                        <BarChart3 className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold text-lg">View Analytics</div>
+                        <div className="text-sm text-white/80">Performance insights</div>
+                      </div>
+                    </div>
+                  </Button>
+                )}
               </div>
               
               {/* Latest Updates - Only if there are any updates */}
