@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -60,6 +59,7 @@ const JobDetails = () => {
           role: data.role,
           salaryLPA: data.salary_lpa,
           interviewDate: new Date(data.interview_date),
+          interviewTime: data.interview_time,
           status: validStatus,
           notes: data.notes || "",
           createdAt: new Date(data.created_at),
@@ -173,6 +173,14 @@ const JobDetails = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Interview Date</p>
                 <p className="font-medium">{format(job.interviewDate, "PPP")}</p>
+              </div>
+            </Card>
+            
+            <Card className="p-4 flex items-center gap-3">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="text-sm text-muted-foreground">Interview Time</p>
+                <p className="font-medium">{job.interviewTime}</p>
               </div>
             </Card>
             

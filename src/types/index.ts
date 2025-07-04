@@ -77,6 +77,7 @@ export const dummyJobs: JobApplication[] = [
     role: "Frontend Developer",
     salaryLPA: "18",
     interviewDate: new Date(Date.now() + 86400000 * 2), // 2 days from now
+    interviewTime: "10:00 AM",
     status: "upcoming",
     notes: "Prepare for React questions",
     createdAt: new Date(),
@@ -89,6 +90,7 @@ export const dummyJobs: JobApplication[] = [
     role: "Software Engineer",
     salaryLPA: "20",
     interviewDate: new Date(Date.now() - 86400000 * 3), // 3 days ago
+    interviewTime: "2:00 PM",
     status: "completed",
     notes: "Asked about data structures",
     createdAt: new Date(),
@@ -101,6 +103,7 @@ export const dummyJobs: JobApplication[] = [
     role: "Full Stack Developer",
     salaryLPA: "22",
     interviewDate: new Date(Date.now() - 86400000 * 7), // 7 days ago
+    interviewTime: "11:30 AM",
     status: "rejected",
     notes: "Need to improve on system design",
     createdAt: new Date(),
@@ -113,6 +116,7 @@ export const dummyJobs: JobApplication[] = [
     role: "React Developer",
     salaryLPA: "25",
     interviewDate: new Date(Date.now() + 86400000 * 5), // 5 days from now
+    interviewTime: "3:30 PM",
     status: "upcoming",
     notes: "Review React hooks",
     createdAt: new Date(),
