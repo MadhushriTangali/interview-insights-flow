@@ -54,16 +54,19 @@ export function RatingVisualization({ ratings }: RatingVisualizationProps) {
     );
   }
 
-  // Calculate average ratings
+  // Calculate average ratings with proper type handling
   const avgRatings = ratings.reduce((acc, rating) => {
-    Object.keys(rating).forEach(key => {
-      if (key !== 'feedback' && key !== 'overall_rating') {
-        acc[key] = (acc[key] || 0) + rating[key as keyof RatingData];
-      }
+    const keys = ['technical', 'managerial', 'projects', 'self_introduction', 'hr_round', 'dressup', 'communication', 'body_language', 'punctuality'] as const;
+    
+    keys.forEach(key => {
+      const value = Number(rating[key]) || 0; // Ensure it's a number
+      acc[key] = (acc[key] || 0) + value;
     });
+    
     return acc;
   }, {} as Record<string, number>);
 
+  // Calculate averages
   Object.keys(avgRatings).forEach(key => {
     avgRatings[key] = avgRatings[key] / ratings.length;
   });
@@ -85,7 +88,7 @@ export function RatingVisualization({ ratings }: RatingVisualizationProps) {
     color: COLORS[index % COLORS.length]
   }));
 
-  const overallAverage = ratings.reduce((sum, rating) => sum + rating.overall_rating, 0) / ratings.length;
+  const overallAverage = ratings.reduce((sum, rating) => sum + Number(rating.overall_rating), 0) / ratings.length;
 
   return (
     <div className="space-y-6">
