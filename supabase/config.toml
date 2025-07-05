@@ -51,6 +51,9 @@ enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
 
+[functions.send-interview-reminders]
+verify_jwt = false
+
 [functions.interview-scheduler]
 verify_jwt = false
 
