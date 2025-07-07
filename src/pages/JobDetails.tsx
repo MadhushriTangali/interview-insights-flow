@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -10,15 +11,22 @@ import { Card } from "@/components/ui/card";
 import { JobApplication } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const JobDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [job, setJob] = useState<JobApplication | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
+    if (!user) {
+      navigate("/auth/login");
+      return;
+    }
+
     const getJobDetails = async () => {
       if (!id) {
         setError("No job ID provided");
@@ -33,6 +41,7 @@ const JobDetails = () => {
           .from('job_applications')
           .select('*')
           .eq('id', id)
+          .eq('user_id', user.id)
           .single();
           
         if (error) {
@@ -46,12 +55,6 @@ const JobDetails = () => {
         }
         
         // Transform data to match JobApplication type
-        // Fix: Ensure status is one of the allowed enum values
-        let validStatus: "upcoming" | "completed" | "rejected" = "upcoming";
-        if (data.status === "completed" || data.status === "rejected") {
-          validStatus = data.status as "completed" | "rejected";
-        }
-        
         const transformedJob: JobApplication = {
           id: data.id,
           userId: data.user_id,
@@ -60,7 +63,7 @@ const JobDetails = () => {
           salaryLPA: data.salary_lpa,
           interviewDate: new Date(data.interview_date),
           interviewTime: data.interview_time,
-          status: validStatus,
+          status: data.status as "upcoming" | "completed" | "rejected" | "succeeded",
           notes: data.notes || "",
           createdAt: new Date(data.created_at),
           updatedAt: new Date(data.updated_at)
@@ -76,7 +79,7 @@ const JobDetails = () => {
     };
     
     getJobDetails();
-  }, [id]);
+  }, [id, user, navigate]);
   
   const handleDelete = async () => {
     if (!job?.id) return;
@@ -132,6 +135,13 @@ const JobDetails = () => {
     );
   }
   
+  const statusColors = {
+    upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+    completed: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+    rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+    succeeded: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+  };
+  
   return (
     <>
       <Header />
@@ -155,13 +165,7 @@ const JobDetails = () => {
                 <p className="text-muted-foreground">{job.role}</p>
               </div>
               
-              <Badge className={
-                job.status === "upcoming" 
-                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" 
-                  : job.status === "completed" 
-                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
-                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-              }>
+              <Badge className={statusColors[job.status as keyof typeof statusColors]}>
                 {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
               </Badge>
             </div>
@@ -212,15 +216,13 @@ const JobDetails = () => {
             </div>
             
             <div className="flex gap-3">
-              {job.status === "upcoming" && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate(`/edit-job/${job.id}`)}
-                >
-                  <Tag className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              )}
+              <Button 
+                variant="outline" 
+                onClick={() => navigate(`/edit-job/${job.id}`)}
+              >
+                <Tag className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
               
               <Button 
                 variant="destructive"

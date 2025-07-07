@@ -13,7 +13,6 @@ import {
   Briefcase,
   Star,
   BookOpen,
-  MessageSquare,
   Newspaper
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,18 +44,39 @@ const Header = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error("Error signing in with Google");
+    }
+  };
+
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
+  // Show limited navigation for unauthenticated users
+  const publicNavItems = [
+    { path: "/", label: "Home", icon: Home },
+  ];
+
+  // Show full navigation for authenticated users
+  const privateNavItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/tracker", label: "Tracker", icon: Briefcase },
     { path: "/scheduler", label: "Scheduler", icon: Calendar },
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/ratings", label: "Ratings", icon: Star },
     { path: "/prep", label: "Prep", icon: BookOpen },
-    { path: "/feedback", label: "Feedback", icon: MessageSquare },
     { path: "/news", label: "News", icon: Newspaper },
   ];
+
+  const navItems = user ? privateNavItems : publicNavItems;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -141,6 +161,13 @@ const Header = () => {
               >
                 Sign up
               </Button>
+              <Button 
+                variant="outline"
+                onClick={handleGoogleSignIn}
+                className="text-sm"
+              >
+                Sign in with Google
+              </Button>
             </div>
           )}
 
@@ -204,6 +231,17 @@ const Header = () => {
                   }}
                 >
                   Sign up
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    handleGoogleSignIn();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Sign in with Google
                 </Button>
               </div>
             )}
