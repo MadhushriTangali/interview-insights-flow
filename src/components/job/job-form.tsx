@@ -56,7 +56,7 @@ type JobFormProps = {
 
 export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps) {
   const navigate = useNavigate();
-  const [currentStatus, setCurrentStatus] = useState(initialData?.status || "upcoming");
+  const [currentStatus, setCurrentStatus] = useState<"upcoming" | "completed" | "rejected" | "succeeded">(initialData?.status || "upcoming");
 
   const form = useForm<z.infer<typeof jobFormSchema>>({
     resolver: zodResolver(jobFormSchema),
@@ -155,7 +155,7 @@ export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps
               <FormItem>
                 <FormLabel>Status</FormLabel>
                 <Select 
-                  onValueChange={(value) => {
+                  onValueChange={(value: "upcoming" | "completed" | "rejected" | "succeeded") => {
                     field.onChange(value);
                     setCurrentStatus(value);
                   }} 

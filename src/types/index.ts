@@ -16,7 +16,7 @@ export type JobApplication = {
   salaryLPA: string;
   interviewDate: Date;
   interviewTime: string;
-  status: 'upcoming' | 'completed' | 'rejected';
+  status: 'upcoming' | 'completed' | 'rejected' | 'succeeded';
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
