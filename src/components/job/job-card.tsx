@@ -8,7 +8,8 @@ import {
   Edit, 
   MoreVertical, 
   Star, 
-  Trash
+  Trash,
+  Eye
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,8 +46,9 @@ export function JobCard({ job, onDelete }: JobCardProps) {
   
   const statusColors = {
     upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-    completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    completed: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+    succeeded: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   };
 
   const handleEdit = () => {
@@ -67,7 +69,7 @@ export function JobCard({ job, onDelete }: JobCardProps) {
   };
 
   return (
-    <Card className="job-card">
+    <Card className="job-card hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -87,15 +89,25 @@ export function JobCard({ job, onDelete }: JobCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleView}>View Details</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-                {job.status === "upcoming" && (
-                  <DropdownMenuItem onClick={handleRate}>Rate Interview</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleView}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                {(job.status === "completed" || job.status === "succeeded" || job.status === "rejected") && (
+                  <DropdownMenuItem onClick={handleRate}>
+                    <Star className="h-4 w-4 mr-2" />
+                    Rate Interview
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600">
+                      <Trash className="h-4 w-4 mr-2" />
                       Delete
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
@@ -128,7 +140,7 @@ export function JobCard({ job, onDelete }: JobCardProps) {
           
           <div className="flex items-center text-muted-foreground">
             <Clock className="h-4 w-4 mr-2" />
-            <span>{format(new Date(job.interviewDate), "h:mm a")}</span>
+            <span>{job.interviewTime}</span>
           </div>
           
           <div className="flex items-center">
@@ -138,10 +150,11 @@ export function JobCard({ job, onDelete }: JobCardProps) {
         
         <div className="mt-5 flex justify-between">
           <Button variant="outline" size="sm" onClick={handleView}>
+            <Eye className="h-4 w-4 mr-1" />
             View Details
           </Button>
           
-          {job.status === "completed" ? (
+          {(job.status === "completed" || job.status === "succeeded" || job.status === "rejected") ? (
             <Button size="sm" className="flex items-center gap-1" onClick={handleRate}>
               <Star className="h-4 w-4" /> Rate Interview
             </Button>

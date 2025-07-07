@@ -42,7 +42,7 @@ const jobFormSchema = z.object({
     required_error: "Interview date is required",
   }),
   interviewTime: z.string().min(1, "Interview time is required"),
-  status: z.enum(["upcoming", "completed", "rejected"], {
+  status: z.enum(["upcoming", "completed", "rejected", "succeeded"], {
     required_error: "Status is required",
   }),
   notes: z.string().optional(),
@@ -56,6 +56,7 @@ type JobFormProps = {
 
 export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps) {
   const navigate = useNavigate();
+  const [currentStatus, setCurrentStatus] = useState(initialData?.status || "upcoming");
 
   const form = useForm<z.infer<typeof jobFormSchema>>({
     resolver: zodResolver(jobFormSchema),
@@ -84,6 +85,21 @@ export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps
       console.error("Error saving job:", error);
       toast.error("Failed to save interview details");
     }
+  };
+
+  // Get available status options based on current status
+  const getStatusOptions = () => {
+    if (currentStatus === "completed") {
+      return [
+        { value: "completed", label: "Completed" },
+        { value: "rejected", label: "Rejected" },
+        { value: "succeeded", label: "Succeeded" },
+      ];
+    }
+    return [
+      { value: "upcoming", label: "Upcoming" },
+      { value: "completed", label: "Completed" },
+    ];
   };
 
   return (
@@ -138,16 +154,24 @@ export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select 
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setCurrentStatus(value);
+                  }} 
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
+                    {getStatusOptions().map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />

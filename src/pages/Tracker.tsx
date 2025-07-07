@@ -17,7 +17,7 @@ const Tracker = () => {
   const navigate = useNavigate();
   const { user, session, loading: authLoading } = useAuth();
   const [jobs, setJobs] = useState<JobApplication[]>([]);
-  const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected">("all");
+  const [filter, setFilter] = useState<"all" | "upcoming" | "completed" | "rejected" | "succeeded">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -45,7 +45,7 @@ const Tracker = () => {
           salaryLPA: job.salary_lpa,
           interviewDate: new Date(job.interview_date),
           interviewTime: job.interview_time,
-          status: job.status as "upcoming" | "completed" | "rejected",
+          status: job.status as "upcoming" | "completed" | "rejected" | "succeeded",
           notes: job.notes || "",
           createdAt: new Date(job.created_at),
           updatedAt: new Date(job.updated_at)
@@ -108,6 +108,7 @@ const Tracker = () => {
     upcoming: jobs.filter(job => job.status === "upcoming").length,
     completed: jobs.filter(job => job.status === "completed").length,
     rejected: jobs.filter(job => job.status === "rejected").length,
+    succeeded: jobs.filter(job => job.status === "succeeded").length,
   };
 
   // Show loading while auth is loading
@@ -149,11 +150,11 @@ const Tracker = () => {
           </div>
 
           {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
             <div className="p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.total}</div>
-                <div className="text-sm font-medium text-muted-foreground mt-1">Total Interviews</div>
+                <div className="text-sm font-medium text-muted-foreground mt-1">Total</div>
               </div>
             </div>
             
@@ -164,10 +165,17 @@ const Tracker = () => {
               </div>
             </div>
             
+            <div className="p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-600 dark:text-gray-400">{stats.completed}</div>
+                <div className="text-sm font-medium text-muted-foreground mt-1">Completed</div>
+              </div>
+            </div>
+            
             <div className="p-6 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-green-200/50 dark:border-green-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.completed}</div>
-                <div className="text-sm font-medium text-muted-foreground mt-1">Completed</div>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.succeeded}</div>
+                <div className="text-sm font-medium text-muted-foreground mt-1">Succeeded</div>
               </div>
             </div>
             
@@ -200,15 +208,18 @@ const Tracker = () => {
           <div className="mb-8">
             <Tabs defaultValue="all" className="w-full"
               onValueChange={(value) => setFilter(value as any)}>
-              <TabsList className="grid grid-cols-4 md:w-[500px] h-14 p-1 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
+              <TabsList className="grid grid-cols-5 md:w-[600px] h-14 p-1 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
                 <TabsTrigger value="all" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
                   All ({stats.total})
                 </TabsTrigger>
                 <TabsTrigger value="upcoming" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white">
                   Upcoming ({stats.upcoming})
                 </TabsTrigger>
-                <TabsTrigger value="completed" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600 data-[state=active]:text-white">
+                <TabsTrigger value="completed" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-700 data-[state=active]:text-white">
                   Completed ({stats.completed})
+                </TabsTrigger>
+                <TabsTrigger value="succeeded" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600 data-[state=active]:text-white">
+                  Succeeded ({stats.succeeded})
                 </TabsTrigger>
                 <TabsTrigger value="rejected" className="text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-pink-600 data-[state=active]:text-white">
                   Rejected ({stats.rejected})
