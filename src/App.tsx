@@ -21,7 +21,6 @@ import JobDetails from "./pages/JobDetails";
 import EditJob from "./pages/EditJob";
 import RatingPage from "./pages/RatingPage";
 import RatingsPage from "./pages/RatingsPage";
-import FeedbackPage from "./pages/FeedbackPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,11 +45,10 @@ const App = () => (
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/job/:id" element={<JobDetails />} />
-              <Route path="/job/:id/edit" element={<EditJob />} />
-              <Route path="/job/:id/rate" element={<RatingPage />} />
+              <Route path="/job-details/:id" element={<JobDetails />} />
+              <Route path="/edit-job/:id" element={<EditJob />} />
+              <Route path="/rate/:id" element={<RatingPage />} />
               <Route path="/ratings" element={<RatingsPage />} />
-              <Route path="/job/:id/feedback" element={<FeedbackPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

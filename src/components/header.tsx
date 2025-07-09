@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -61,16 +60,13 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   // Show limited navigation for unauthenticated users
-  const publicNavItems = [
-    { path: "/", label: "Home", icon: Home },
-  ];
+  const publicNavItems = [];
 
-  // Show full navigation for authenticated users
+  // Show full navigation for authenticated users (without Home)
   const privateNavItems = [
-    { path: "/", label: "Home", icon: Home },
+    { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/tracker", label: "Tracker", icon: Briefcase },
     { path: "/scheduler", label: "Scheduler", icon: Calendar },
-    { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/ratings", label: "Ratings", icon: Star },
     { path: "/prep", label: "Prep", icon: BookOpen },
     { path: "/news", label: "News", icon: Newspaper },
@@ -84,7 +80,7 @@ const Header = () => {
         {/* Logo */}
         <div 
           className="flex items-center space-x-2 cursor-pointer" 
-          onClick={() => navigate("/")}
+          onClick={() => navigate(user ? "/dashboard" : "/")}
         >
           <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white">
             <Calendar className="h-5 w-5" />
@@ -166,7 +162,7 @@ const Header = () => {
                 onClick={handleGoogleSignIn}
                 className="text-sm"
               >
-                Sign in with Google
+                Continue with Google
               </Button>
             </div>
           )}
@@ -241,7 +237,7 @@ const Header = () => {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Sign in with Google
+                  Continue with Google
                 </Button>
               </div>
             )}

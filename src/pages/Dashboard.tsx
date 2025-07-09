@@ -34,25 +34,19 @@ const Dashboard = () => {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Filter out past interviews (older than 24 hours)
-        const now = new Date();
-        const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        
-        const transformedData: JobApplication[] = data
-          .filter(job => new Date(job.interview_date) > cutoffTime)
-          .map(job => ({
-            id: job.id,
-            userId: job.user_id,
-            companyName: job.company_name,
-            role: job.role,
-            salaryLPA: job.salary_lpa,
-            interviewDate: new Date(job.interview_date),
-            interviewTime: job.interview_time,
-            status: job.status as "upcoming" | "completed" | "rejected",
-            notes: job.notes || "",
-            createdAt: new Date(job.created_at),
-            updatedAt: new Date(job.updated_at)
-          }));
+        const transformedData: JobApplication[] = data.map(job => ({
+          id: job.id,
+          userId: job.user_id,
+          companyName: job.company_name,
+          role: job.role,
+          salaryLPA: job.salary_lpa,
+          interviewDate: new Date(job.interview_date),
+          interviewTime: job.interview_time,
+          status: job.status as "upcoming" | "completed" | "rejected" | "succeeded",
+          notes: job.notes || "",
+          createdAt: new Date(job.created_at),
+          updatedAt: new Date(job.updated_at)
+        }));
         
         setJobs(transformedData);
       } else {
@@ -80,9 +74,6 @@ const Dashboard = () => {
     }
     
     fetchInterviews();
-    
-    // For demo purposes, we're setting hasRatings to false initially
-    // In a real app, this would be fetched from a ratings table
   }, [user, session, authLoading, navigate]);
 
   if (authLoading) {
@@ -102,7 +93,8 @@ const Dashboard = () => {
   }
 
   const upcomingInterviews = jobs.filter((job) => job.status === "upcoming");
-  const completedInterviews = jobs.filter((job) => job.status === "completed");
+  // Include all non-upcoming interviews as completed (completed, rejected, succeeded)
+  const completedInterviews = jobs.filter((job) => job.status !== "upcoming");
 
   // Check if there are any updates to show
   const hasUpdates = jobs.length > 0;
@@ -167,7 +159,7 @@ const Dashboard = () => {
                       <CheckCircle className="h-6 w-6 text-white" />
                     </div>
                   </div>
-                  <p className="text-xs text-green-500 dark:text-green-400 mt-2">Past interviews</p>
+                  <p className="text-xs text-green-500 dark:text-green-400 mt-2">Finished interviews</p>
                 </div>
 
                 <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-yellow-200 dark:border-yellow-800 hover:shadow-xl transition-all duration-300">

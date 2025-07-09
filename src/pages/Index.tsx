@@ -1,132 +1,122 @@
+
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Calendar, CheckCircle, BarChart3, Target, ArrowRight } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    // Redirect authenticated users to dashboard
+    if (!loading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="flex-1 flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  // Only show landing page content for unauthenticated users
+  if (user) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <>
       <Header />
       
-      <main className="relative overflow-hidden">
+      <main className="flex-1">
         {/* Hero Section */}
-        <div className="relative z-10 pt-16 pb-20 sm:pt-24 sm:pb-40">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                <span className="block">Track Your</span>
-                <span className="block text-blue-600 dark:text-blue-400">Interview Journey</span>
-              </h1>
-              <p className="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                Organize your job applications, prepare for interviews, and land your dream job with our comprehensive interview tracking platform.
-              </p>
-              <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-                <div className="rounded-md shadow">
-                  <Button
-                    onClick={() => navigate("/auth")}
-                    size="lg"
-                    className="w-full flex items-center justify-center px-8 py-3 text-base font-medium"
-                  >
-                    Get Started
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
+        <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-indigo-950/20">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center space-y-8 text-center">
+              <div className="space-y-6">
+                <div className="flex justify-center">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white shadow-xl">
+                    <Target className="h-12 w-12" />
+                  </div>
                 </div>
-                <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate("/auth")}
-                    size="lg"
-                    className="w-full flex items-center justify-center px-8 py-3 text-base font-medium"
-                  >
-                    Sign In
-                  </Button>
-                </div>
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Master Your Interview Journey
+                </h1>
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                  Track applications, schedule interviews, and improve your performance with our comprehensive interview management platform.
+                </p>
+              </div>
+              <div className="space-x-4">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/auth/register")}
+                  className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => navigate("/auth/login")}
+                >
+                  Sign In
+                </Button>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Features Section */}
-        <div className="bg-white dark:bg-gray-700 py-12">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="lg:text-center">
-              <p className="text-base text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase">Features</p>
-              <h2 className="mt-2 text-3xl leading-8 font-extrabold text-gray-900 dark:text-white sm:text-4xl">
-                Everything you need to succeed
-              </h2>
-              <p className="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
-                Our platform is designed to help you stay organized, prepared, and confident throughout your interview process.
-              </p>
-            </div>
-
-            <div className="mt-10">
-              <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">Track Applications</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                    Easily log and monitor your job applications, from submission to offer.
-                  </dd>
+        <section className="py-20">
+          <div className="container px-4 md:px-6">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20">
+                  <Calendar className="h-8 w-8 text-purple-600" />
                 </div>
-
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 4.75 7.5 4.75a4.5 4.5 0 00-4.5 4.5c0 1.789 2.913 3.93 6.75 3.93zm4.5 5.814v-1.122c0-.414-.895-.75-2-1.122M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-                      </svg>
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">Interview Preparation</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                    Access resources and tips to help you prepare for technical and behavioral questions.
-                  </dd>
+                <h3 className="text-xl font-bold">Schedule & Track</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Keep all your interviews organized in one place with smart scheduling and tracking features.
+                </p>
+              </div>
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-green-100 to-teal-100 dark:from-green-900/20 dark:to-teal-900/20">
+                  <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
-
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.002 0M3 15l3-1.5m0 0l-3-6a5.002 5.002 0 006.002 0M6 7.5l12 2.25M6 16.5l12-2.25M18 7.5l-6 2.25m6 6l-6-2.25" />
-                      </svg>
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">Real-time Feedback</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                    Get insights into your performance with tools for self-evaluation and feedback collection.
-                  </dd>
+                <h3 className="text-xl font-bold">Prepare Effectively</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Access company-specific questions and practice materials to ace your interviews.
+                </p>
+              </div>
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/20 dark:to-purple-900/20">
+                  <BarChart3 className="h-8 w-8 text-indigo-600" />
                 </div>
-
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                      </svg>
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">Notes and Insights</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                    Keep detailed notes on each interview, track key insights, and refine your strategy.
-                  </dd>
-                </div>
-              </dl>
+                <h3 className="text-xl font-bold">Analyze Performance</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Track your progress and get insights to continuously improve your interview skills.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       </main>
       
       <Footer />
-    </div>
+    </>
   );
 };
 
