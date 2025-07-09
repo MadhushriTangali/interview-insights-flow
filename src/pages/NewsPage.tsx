@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { JobOpenings } from "@/components/news/job-openings";
 import { 
   Search, 
   ExternalLink, 
@@ -16,7 +17,6 @@ import {
   Users, 
   DollarSign,
   Globe,
-  Filter,
   Clock
 } from "lucide-react";
 
@@ -36,6 +36,8 @@ const NewsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [jobRole, setJobRole] = useState("");
+  const [jobLocation, setJobLocation] = useState("");
 
   // Mock news data - in a real app, this would come from an API
   const mockNews: NewsItem[] = [
@@ -157,168 +159,199 @@ const NewsPage = () => {
               </div>
             </div>
             <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              News & Hiring Trends
+              News & Hiring
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Stay ahead of the curve with the latest industry news, hiring trends, and career insights to supercharge your job search.
+              Stay ahead with the latest industry news, hiring trends, and real-time job opportunities to supercharge your career.
             </p>
           </div>
 
-          {/* Search and Filter Section */}
-          <div className="flex flex-col md:flex-row gap-6 mb-12">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                <Input
-                  placeholder="Search news and trends..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 text-base rounded-xl border-2 border-purple-200/50 dark:border-purple-800/50 focus:border-purple-500 dark:focus:border-purple-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Category Tabs */}
-          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-12">
-            <TabsList className="w-full md:w-auto grid grid-cols-2 md:flex md:flex-row gap-2 h-auto p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
-              {Object.entries(categories).map(([key, { label, icon: Icon, count }]) => (
-                <TabsTrigger 
-                  key={key} 
-                  value={key}
-                  className="flex items-center gap-3 px-6 py-4 text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
-                >
-                  <Icon className="h-5 w-5" />
-                  {label}
-                  <Badge variant="secondary" className="ml-2 bg-white/20 text-current">
-                    {count}
-                  </Badge>
-                </TabsTrigger>
-              ))}
+          {/* Main Tabs */}
+          <Tabs defaultValue="news" className="mb-12">
+            <TabsList className="w-full md:w-auto grid grid-cols-2 h-14 p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
+              <TabsTrigger 
+                value="news"
+                className="flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
+              >
+                <TrendingUp className="h-5 w-5" />
+                Industry News
+              </TabsTrigger>
+              <TabsTrigger 
+                value="jobs"
+                className="flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
+              >
+                <Briefcase className="h-5 w-5" />
+                Job Openings
+              </TabsTrigger>
             </TabsList>
-          </Tabs>
 
-          {/* Featured News Section */}
-          {selectedCategory === "all" && featuredNews.length > 0 && (
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200 flex items-center gap-3">
-                <div className="w-2 h-8 bg-gradient-to-b from-purple-600 to-blue-600 rounded-full"></div>
-                Featured Stories
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {featuredNews.map((item) => (
-                  <Card key={item.id} className="group border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-hidden">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <Badge className={`${getCategoryColor(item.category)} text-white font-semibold px-3 py-1`}>
-                          {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
-                        </Badge>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(item.publishedAt)}
-                        </div>
-                      </div>
-                      <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight">
-                        {item.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base text-muted-foreground leading-relaxed mb-6">
-                        {item.description}
-                      </CardDescription>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                          {item.source}
-                        </span>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="border-2 border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-semibold rounded-lg group-hover:border-purple-600 transition-all duration-300"
-                        >
-                          Read More
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Regular News Section */}
-          <div>
-            <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200 flex items-center gap-3">
-              <div className="w-2 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
-              {selectedCategory === "all" ? "Latest News" : `${categories[selectedCategory as keyof typeof categories]?.label}`}
-            </h2>
-            
-            {isLoading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-gradient-to-r from-purple-600 to-blue-600 border-t-transparent"></div>
-              </div>
-            ) : regularNews.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {regularNews.map((item) => (
-                  <Card key={item.id} className="group border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge className={`${getCategoryColor(item.category)} text-white font-medium px-2 py-1 text-xs`}>
-                          {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
-                        </Badge>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          {formatDate(item.publishedAt)}
-                        </div>
-                      </div>
-                      <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight line-clamp-2">
-                        {item.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
-                        {item.description}
-                      </CardDescription>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
-                          {item.source}
-                        </span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-medium p-2"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card className="border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg">
-                <CardContent className="p-12 text-center">
-                  <div className="rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 p-8 mb-6 inline-block">
-                    <Search className="h-16 w-16 text-purple-600 dark:text-purple-400" />
+            <TabsContent value="news" className="mt-8">
+              {/* Search and Filter Section */}
+              <div className="flex flex-col md:flex-row gap-6 mb-12">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+                    <Input
+                      placeholder="Search news and trends..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-12 h-14 text-base rounded-xl border-2 border-purple-200/50 dark:border-purple-800/50 focus:border-purple-500 dark:focus:border-purple-400 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
+                    />
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-200">No Articles Found</h3>
-                  <p className="text-lg text-muted-foreground mb-6">
-                    {searchQuery 
-                      ? "Try adjusting your search terms or explore different categories."
-                      : "No articles available in this category at the moment."}
-                  </p>
-                  {searchQuery && (
-                    <Button 
-                      onClick={() => setSearchQuery("")}
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 text-base font-semibold rounded-xl"
+                </div>
+              </div>
+
+              {/* Category Tabs */}
+              <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-12">
+                <TabsList className="w-full md:w-auto grid grid-cols-2 md:flex md:flex-row gap-2 h-auto p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-purple-200/50 dark:border-purple-800/50 shadow-lg">
+                  {Object.entries(categories).map(([key, { label, icon: Icon, count }]) => (
+                    <TabsTrigger 
+                      key={key} 
+                      value={key}
+                      className="flex items-center gap-3 px-6 py-4 text-base font-semibold rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
                     >
-                      Clear Search
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                      <Icon className="h-5 w-5" />
+                      {label}
+                      <Badge variant="secondary" className="ml-2 bg-white/20 text-current">
+                        {count}
+                      </Badge>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+
+              {/* Featured News Section */}
+              {selectedCategory === "all" && featuredNews.length > 0 && (
+                <div className="mb-12">
+                  <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200 flex items-center gap-3">
+                    <div className="w-2 h-8 bg-gradient-to-b from-purple-600 to-blue-600 rounded-full"></div>
+                    Featured Stories
+                  </h2>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {featuredNews.map((item) => (
+                      <Card key={item.id} className="group border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-hidden">
+                        <CardHeader className="pb-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <Badge className={`${getCategoryColor(item.category)} text-white font-semibold px-3 py-1`}>
+                              {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                            </Badge>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              {formatDate(item.publishedAt)}
+                            </div>
+                          </div>
+                          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight">
+                            {item.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base text-muted-foreground leading-relaxed mb-6">
+                            {item.description}
+                          </CardDescription>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                              {item.source}
+                            </span>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="border-2 border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-semibold rounded-lg group-hover:border-purple-600 transition-all duration-300"
+                            >
+                              Read More
+                              <ExternalLink className="ml-2 h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Regular News Section */}
+              <div>
+                <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-200 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
+                  {selectedCategory === "all" ? "Latest News" : `${categories[selectedCategory as keyof typeof categories]?.label}`}
+                </h2>
+                
+                {isLoading ? (
+                  <div className="flex justify-center py-20">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gradient-to-r from-purple-600 to-blue-600 border-t-transparent"></div>
+                  </div>
+                ) : regularNews.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {regularNews.map((item) => (
+                      <Card key={item.id} className="group border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
+                        <CardHeader className="pb-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <Badge className={`${getCategoryColor(item.category)} text-white font-medium px-2 py-1 text-xs`}>
+                              {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                            </Badge>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatDate(item.publishedAt)}
+                            </div>
+                          </div>
+                          <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight line-clamp-2">
+                            {item.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+                            {item.description}
+                          </CardDescription>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                              {item.source}
+                            </span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-medium p-2"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="border-2 border-purple-200/50 dark:border-purple-800/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg">
+                    <CardContent className="p-12 text-center">
+                      <div className="rounded-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 p-8 mb-6 inline-block">
+                        <Search className="h-16 w-16 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-200">No Articles Found</h3>
+                      <p className="text-lg text-muted-foreground mb-6">
+                        {searchQuery 
+                          ? "Try adjusting your search terms or explore different categories."
+                          : "No articles available in this category at the moment."}
+                      </p>
+                      {searchQuery && (
+                        <Button 
+                          onClick={() => setSearchQuery("")}
+                          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 text-base font-semibold rounded-xl"
+                        >
+                          Clear Search
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="jobs" className="mt-8">
+              <JobOpenings
+                role={jobRole}
+                location={jobLocation}
+                onRoleChange={setJobRole}
+                onLocationChange={setJobLocation}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       

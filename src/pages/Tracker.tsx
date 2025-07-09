@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInterviewCleanup } from "@/hooks/useInterviewCleanup";
+import { useAutoUpdateExpiredInterviews } from "@/hooks/useAutoUpdateExpiredInterviews";
 
 const Tracker = () => {
   const navigate = useNavigate();
@@ -66,6 +67,9 @@ const Tracker = () => {
 
   // Use the cleanup hook to refresh data when interviews are removed
   useInterviewCleanup(fetchJobs);
+  
+  // Use the auto-update hook to handle expired interviews
+  useAutoUpdateExpiredInterviews(fetchJobs);
   
   useEffect(() => {
     // Wait for auth to load first

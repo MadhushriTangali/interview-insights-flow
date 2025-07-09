@@ -1,36 +1,26 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
+  Target, 
   BarChart3, 
-  User, 
-  LogOut, 
-  Menu, 
-  X, 
-  Home,
-  Briefcase,
-  Star,
-  BookOpen,
-  Newspaper
+  Brain, 
+  Newspaper,
+  User,
+  LogOut,
+  Menu,
+  X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -38,41 +28,21 @@ const Header = () => {
       await supabase.auth.signOut();
       toast.success("Signed out successfully");
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Error signing out:", error);
       toast.error("Error signing out");
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
-        }
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast.error("Error signing in with Google");
     }
   };
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Show limited navigation for unauthenticated users
-  const publicNavItems = [];
-
-  // Show full navigation for authenticated users (without Home)
-  const privateNavItems = [
+  const navItems = user ? [
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { path: "/tracker", label: "Tracker", icon: Briefcase },
     { path: "/scheduler", label: "Scheduler", icon: Calendar },
-    { path: "/ratings", label: "Ratings", icon: Star },
-    { path: "/prep", label: "Prep", icon: BookOpen },
-    { path: "/news", label: "News", icon: Newspaper },
-  ];
-
-  const navItems = user ? privateNavItems : publicNavItems;
+    { path: "/tracker", label: "Tracker", icon: Target },
+    { path: "/prep", label: "Preparation", icon: Brain },
+    { path: "/news", label: "News & Hiring", icon: Newspaper },
+  ] : [];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -83,164 +53,111 @@ const Header = () => {
           onClick={() => navigate(user ? "/dashboard" : "/")}
         >
           <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-            <Calendar className="h-5 w-5" />
+            <Target className="h-6 w-6" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            InterviewTracker
+            InterviewMaster
           </span>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
+        {user && (
+          <nav className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant={isActive(item.path) ? "default" : "ghost"}
-                size="sm"
                 onClick={() => navigate(item.path)}
-                className={cn(
-                  "flex items-center space-x-2 transition-all duration-200",
-                  isActive(item.path) && "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                )}
+                className={`flex items-center space-x-2 ${
+                  isActive(item.path) 
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white" 
+                    : "hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                }`}
               >
-                <Icon className="h-4 w-4" />
+                <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
               </Button>
-            );
-          })}
-        </nav>
+            ))}
+          </nav>
+        )}
 
-        {/* Right side - Auth buttons or User menu */}
+        {/* User Menu or Auth Buttons */}
         <div className="flex items-center space-x-4">
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-                      {user.email?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.email}</p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/profile")}>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="hidden sm:flex items-center space-x-2">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate("/auth/login")}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/profile")}
+                className="flex items-center space-x-2 hover:bg-purple-50 dark:hover:bg-purple-900/20"
               >
-                Log in
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Profile</span>
               </Button>
-              <Button 
+              <Button
+                variant="ghost"
+                onClick={handleSignOut}
+                className="flex items-center space-x-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/auth/login")}
+                className="hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              >
+                Sign In
+              </Button>
+              <Button
                 onClick={() => navigate("/auth/register")}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
               >
-                Sign up
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={handleGoogleSignIn}
-                className="text-sm"
-              >
-                Continue with Google
+                Sign Up
               </Button>
             </div>
           )}
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          {user && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t bg-background/95 backdrop-blur">
-          <nav className="container py-4 px-4 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
+      {user && isMobileMenuOpen && (
+        <div className="md:hidden border-t bg-background">
+          <nav className="container py-4 px-4">
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
                 <Button
                   key={item.path}
                   variant={isActive(item.path) ? "default" : "ghost"}
-                  size="sm"
                   onClick={() => {
                     navigate(item.path);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={cn(
-                    "w-full justify-start space-x-2 transition-all duration-200",
-                    isActive(item.path) && "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                  )}
+                  className={`justify-start ${
+                    isActive(item.path) 
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white" 
+                      : "hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
                 </Button>
-              );
-            })}
-            
-            {!user && (
-              <div className="pt-4 space-y-2 border-t">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    navigate("/auth/login");
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Log in
-                </Button>
-                <Button 
-                  size="sm"
-                  className="w-full justify-start bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                  onClick={() => {
-                    navigate("/auth/register");
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Sign up
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    handleGoogleSignIn();
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Continue with Google
-                </Button>
-              </div>
-            )}
+              ))}
+            </div>
           </nav>
         </div>
       )}
