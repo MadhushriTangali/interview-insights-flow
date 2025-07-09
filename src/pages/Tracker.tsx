@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/header";
@@ -93,10 +92,46 @@ const Tracker = () => {
     }
   };
 
-  const handleFormSuccess = () => {
-    setIsFormOpen(false);
-    setEditingJob(null);
-    refetch();
+  const handleFormSave = async (data: any) => {
+    if (!user) return;
+
+    try {
+      const jobData = {
+        user_id: user.id,
+        company_name: data.companyName,
+        role: data.role,
+        salary_lpa: data.salaryLPA,
+        interview_date: data.interviewDate.toISOString(),
+        interview_time: data.interviewTime,
+        status: data.status,
+        notes: data.notes || ""
+      };
+
+      if (editingJob) {
+        const { error } = await supabase
+          .from('job_applications')
+          .update(jobData)
+          .eq('id', editingJob.id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        toast.success("Interview updated successfully");
+      } else {
+        const { error } = await supabase
+          .from('job_applications')
+          .insert(jobData);
+
+        if (error) throw error;
+        toast.success("Interview added successfully");
+      }
+
+      setIsFormOpen(false);
+      setEditingJob(null);
+      refetch();
+    } catch (error: any) {
+      console.error("Error saving job application:", error);
+      toast.error("Failed to save interview");
+    }
   };
 
   const handleFormClose = () => {
@@ -211,8 +246,7 @@ const Tracker = () => {
           </DialogHeader>
           <JobForm
             initialData={editingJob}
-            onSuccess={handleFormSuccess}
-            onCancel={handleFormClose}
+            onSave={handleFormSave}
           />
         </DialogContent>
       </Dialog>
