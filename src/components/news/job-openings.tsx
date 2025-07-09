@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Briefcase, DollarSign, Calendar, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 interface JobOpening {
   id: string;
@@ -29,87 +30,134 @@ interface JobOpeningsProps {
 export function JobOpenings({ role, location, onRoleChange, onLocationChange }: JobOpeningsProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock job data - in real app, this would come from job APIs
+  // Mock job data focused on Indian locations
   const mockJobs: JobOpening[] = [
     {
       id: "1",
       title: "Senior Frontend Developer",
-      company: "Tech Innovators Inc.",
-      location: "San Francisco, CA",
-      salary: "$120,000 - $150,000",
+      company: "TCS",
+      location: "Bangalore, India",
+      salary: "₹15-25 LPA",
       type: "full-time",
       postedDate: "2024-01-15",
-      description: "Join our dynamic team to build cutting-edge web applications using React, TypeScript, and modern frameworks.",
+      description: "Join our dynamic team to build cutting-edge web applications using React, TypeScript, and modern frameworks for global clients.",
       requirements: ["5+ years React experience", "TypeScript proficiency", "REST API integration"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.tcs.com"
     },
     {
       id: "2",
       title: "Full Stack Developer",
-      company: "StartupXYZ",
-      location: "Remote",
-      salary: "$90,000 - $120,000",
-      type: "remote",
+      company: "Infosys",
+      location: "Hyderabad, India",
+      salary: "₹12-20 LPA",
+      type: "full-time",
       postedDate: "2024-01-14",
-      description: "Build scalable web applications from frontend to backend. Work with React, Node.js, and cloud technologies.",
+      description: "Build scalable web applications from frontend to backend. Work with React, Node.js, and cloud technologies in agile environment.",
       requirements: ["React & Node.js experience", "Database knowledge", "Cloud platform familiarity"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.infosys.com"
     },
     {
       id: "3",
       title: "React Developer",
-      company: "Digital Solutions Ltd.",
-      location: "New York, NY",
-      salary: "$85,000 - $110,000",
+      company: "Wipro",
+      location: "Pune, India",
+      salary: "₹8-15 LPA",
       type: "full-time",
       postedDate: "2024-01-13",
-      description: "Create responsive web applications with focus on user experience and performance optimization.",
+      description: "Create responsive web applications with focus on user experience and performance optimization for enterprise clients.",
       requirements: ["3+ years React", "JavaScript ES6+", "CSS/SASS proficiency"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.wipro.com"
     },
     {
       id: "4",
       title: "Software Engineer",
-      company: "Enterprise Corp",
-      location: "Austin, TX",
-      salary: "$100,000 - $130,000",
+      company: "HCL Technologies",
+      location: "Chennai, India",
+      salary: "₹10-18 LPA",
       type: "full-time",
       postedDate: "2024-01-12",
-      description: "Develop enterprise-level applications using modern web technologies and agile methodologies.",
+      description: "Develop enterprise-level applications using modern web technologies and agile methodologies for international projects.",
       requirements: ["JavaScript frameworks", "Version control (Git)", "Agile experience"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.hcltech.com"
     },
     {
       id: "5",
       title: "Frontend Engineer",
-      company: "Innovation Hub",
-      location: "Seattle, WA",
-      salary: "$95,000 - $125,000",
+      company: "Tech Mahindra",
+      location: "Mumbai, India",
+      salary: "₹9-16 LPA",
       type: "full-time",
       postedDate: "2024-01-11",
-      description: "Build user-facing features for our platform used by millions of users worldwide.",
+      description: "Build user-facing features for our digital transformation platform used by clients across various industries.",
       requirements: ["Modern JavaScript", "React/Vue/Angular", "Testing frameworks"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.techmahindra.com"
     },
     {
       id: "6",
       title: "Web Developer",
-      company: "Creative Agency",
-      location: "Los Angeles, CA",
-      salary: "$70,000 - $95,000",
+      company: "Capgemini",
+      location: "Noida, India",
+      salary: "₹6-12 LPA",
       type: "full-time",
       postedDate: "2024-01-10",
-      description: "Create stunning websites and web applications for diverse clients across various industries.",
+      description: "Create innovative web solutions and applications for diverse clients across various industries in collaborative environment.",
       requirements: ["HTML/CSS/JavaScript", "Responsive design", "CMS experience"],
-      applicationUrl: "#"
+      applicationUrl: "https://careers.capgemini.com"
+    },
+    {
+      id: "7",
+      title: "Senior React Developer",
+      company: "Accenture",
+      location: "Gurgaon, India",
+      salary: "₹18-30 LPA",
+      type: "full-time",
+      postedDate: "2024-01-09",
+      description: "Lead frontend development for large-scale enterprise applications using React and modern JavaScript technologies.",
+      requirements: ["6+ years React", "Team leadership", "Architecture design"],
+      applicationUrl: "https://careers.accenture.com"
+    },
+    {
+      id: "8",
+      title: "Full Stack Engineer",
+      company: "Cognizant",
+      location: "Kolkata, India",
+      salary: "₹11-19 LPA",
+      type: "full-time",
+      postedDate: "2024-01-08",
+      description: "Develop end-to-end web applications for healthcare and finance domains using MERN stack and cloud technologies.",
+      requirements: ["MERN stack", "MongoDB", "AWS/Azure"],
+      applicationUrl: "https://careers.cognizant.com"
+    },
+    {
+      id: "9",
+      title: "JavaScript Developer",
+      company: "IBM India",
+      location: "Bangalore, India",
+      salary: "₹14-22 LPA",
+      type: "full-time",
+      postedDate: "2024-01-07",
+      description: "Work on AI-powered web applications and contribute to open-source projects in our innovation lab.",
+      requirements: ["JavaScript/TypeScript", "Node.js", "AI/ML basics"],
+      applicationUrl: "https://careers.ibm.com"
+    },
+    {
+      id: "10",
+      title: "Frontend Architect",
+      company: "Mindtree (LTI)",
+      location: "Pune, India",
+      salary: "₹25-40 LPA",
+      type: "full-time",
+      postedDate: "2024-01-06",
+      description: "Design and architect scalable frontend solutions for enterprise clients with focus on performance and maintainability.",
+      requirements: ["8+ years experience", "System design", "Team leadership"],
+      applicationUrl: "https://careers.ltimindtree.com"
     }
   ];
 
   const filteredJobs = mockJobs.filter(job => {
     const matchesRole = !role || job.title.toLowerCase().includes(role.toLowerCase()) ||
                        job.description.toLowerCase().includes(role.toLowerCase());
-    const matchesLocation = !location || job.location.toLowerCase().includes(location.toLowerCase()) ||
-                           job.type === "remote";
+    const matchesLocation = !location || job.location.toLowerCase().includes(location.toLowerCase());
     return matchesRole && matchesLocation;
   });
 
@@ -119,6 +167,12 @@ export function JobOpenings({ role, location, onRoleChange, onLocationChange }: 
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+  };
+
+  const handleApplyNow = (job: JobOpening) => {
+    // Open the application URL in a new tab
+    window.open(job.applicationUrl, '_blank');
+    toast.success(`Redirecting to ${job.company} careers page`);
   };
 
   const getTypeColor = (type: string) => {
@@ -157,7 +211,7 @@ export function JobOpenings({ role, location, onRoleChange, onLocationChange }: 
         <div>
           <label className="block text-sm font-medium mb-2">Location</label>
           <Input
-            placeholder="e.g. San Francisco, Remote"
+            placeholder="e.g. Bangalore, Mumbai"
             value={location}
             onChange={(e) => onLocationChange(e.target.value)}
             className="h-12"
@@ -184,10 +238,10 @@ export function JobOpenings({ role, location, onRoleChange, onLocationChange }: 
           <>
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
+                {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found in India
               </h3>
               <p className="text-muted-foreground">
-                Showing recent opportunities
+                Showing opportunities from top Indian companies
               </p>
             </div>
             
@@ -248,6 +302,7 @@ export function JobOpenings({ role, location, onRoleChange, onLocationChange }: 
                       </div>
                       <Button
                         size="sm"
+                        onClick={() => handleApplyNow(job)}
                         className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                       >
                         Apply Now
@@ -266,7 +321,7 @@ export function JobOpenings({ role, location, onRoleChange, onLocationChange }: 
             </div>
             <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">No Jobs Found</h3>
             <p className="text-muted-foreground mb-6">
-              Try adjusting your search criteria or explore different roles and locations.
+              Try adjusting your search criteria or explore different roles and locations in India.
             </p>
             <Button 
               onClick={() => {
