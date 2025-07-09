@@ -210,7 +210,7 @@ const Tracker = () => {
             </DialogTitle>
           </DialogHeader>
           <JobForm
-            job={editingJob}
+            initialData={editingJob}
             onSuccess={handleFormSuccess}
             onCancel={handleFormClose}
           />

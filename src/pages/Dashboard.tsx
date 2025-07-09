@@ -10,10 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JobApplication } from "@/types";
 import { useAutoUpdateExpiredInterviews } from "@/hooks/useAutoUpdateExpiredInterviews";
+import { useRatings } from "@/hooks/useRatings";
 import { Calendar, Target, CheckCircle, Award } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { ratings } = useRatings();
   
   const fetchJobApplications = async (): Promise<JobApplication[]> => {
     if (!user) return [];
@@ -98,30 +100,22 @@ const Dashboard = () => {
             <StatCard
               title="Total Applications"
               value={stats.totalApplications}
-              icon={Target}
-              trend="neutral"
-              trendValue=""
+              icon={<Target className="h-4 w-4" />}
             />
             <StatCard
               title="Upcoming Interviews"
               value={stats.upcomingInterviews}
-              icon={Calendar}
-              trend="neutral"
-              trendValue=""
+              icon={<Calendar className="h-4 w-4" />}
             />
             <StatCard
               title="Completed Interviews"
               value={stats.completedInterviews}
-              icon={CheckCircle}
-              trend="neutral"
-              trendValue=""
+              icon={<CheckCircle className="h-4 w-4" />}
             />
             <StatCard
               title="Successful Interviews"
               value={stats.successRate}
-              icon={Award}
-              trend="neutral"
-              trendValue=""
+              icon={<Award className="h-4 w-4" />}
             />
           </div>
           
@@ -130,7 +124,7 @@ const Dashboard = () => {
               interviews={upcomingInterviews} 
               onRefresh={refetch}
             />
-            <RatingVisualization />
+            <RatingVisualization ratings={ratings} />
           </div>
         </div>
       </main>
