@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface ProfileData {
+  phone: string | null;
+}
+
 export function SMSSetup() {
   const { user } = useAuth();
   const [phone, setPhone] = useState("");
@@ -20,23 +24,14 @@ export function SMSSetup() {
       if (!user) return;
       
       try {
-        // Use raw SQL query to access profiles table until types are updated
+        // Use raw SQL query to access profiles table
         const { data, error } = await supabase
-          .rpc('get_user_profile', { user_id: user.id });
+          .from('profiles')
+          .select('phone')
+          .eq('id', user.id)
+          .maybeSingle() as { data: ProfileData | null; error: any };
           
-        if (error) {
-          // Fallback to direct query if RPC doesn't exist
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles' as any)
-            .select('phone')
-            .eq('id', user.id)
-            .maybeSingle();
-            
-          if (!profileError && profileData?.phone) {
-            setPhone(profileData.phone);
-            setHasPhone(true);
-          }
-        } else if (data?.phone) {
+        if (!error && data?.phone) {
           setPhone(data.phone);
           setHasPhone(true);
         }
@@ -66,12 +61,12 @@ export function SMSSetup() {
     setIsSubmitting(true);
     try {
       const { error } = await supabase
-        .from('profiles' as any)
+        .from('profiles')
         .upsert({
           id: user?.id,
           phone: phone,
           updated_at: new Date().toISOString()
-        });
+        } as any);
         
       if (error) throw error;
       

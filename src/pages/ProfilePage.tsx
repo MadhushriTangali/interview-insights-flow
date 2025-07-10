@@ -12,6 +12,10 @@ import { PhoneCollection } from "@/components/profile/phone-collection";
 import { toast } from "sonner";
 import { User, Mail, Calendar, Shield } from "lucide-react";
 
+interface ProfileData {
+  phone: string | null;
+}
+
 const ProfilePage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -28,10 +32,10 @@ const ProfilePage = () => {
       try {
         // Fetch from profiles table
         const { data, error } = await supabase
-          .from('profiles' as any)
+          .from('profiles')
           .select('phone')
           .eq('id', user.id)
-          .maybeSingle();
+          .maybeSingle() as { data: ProfileData | null; error: any };
           
         setProfile({
           email: user.email || "",
@@ -57,12 +61,12 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('profiles' as any)
+        .from('profiles')
         .upsert({
           id: user.id,
           phone: phone,
           updated_at: new Date().toISOString()
-        });
+        } as any);
       
       if (error) throw error;
       
