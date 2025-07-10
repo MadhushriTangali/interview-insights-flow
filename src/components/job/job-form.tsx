@@ -60,9 +60,10 @@ type JobFormProps = {
   initialData?: z.infer<typeof jobFormSchema> & { id: string };
   onSave: (data: z.infer<typeof jobFormSchema>) => void;
   isLoading?: boolean;
+  isEditing?: boolean;
 };
 
-export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps) {
+export function JobForm({ initialData, onSave, isLoading = false, isEditing = false }: JobFormProps) {
   const navigate = useNavigate();
   const [currentStatus, setCurrentStatus] = useState<"upcoming" | "completed" | "rejected" | "succeeded">(initialData?.status || "upcoming");
   const [showCompletedDialog, setShowCompletedDialog] = useState(false);
@@ -122,14 +123,23 @@ export function JobForm({ initialData, onSave, isLoading = false }: JobFormProps
     setPendingFormData(null);
   };
 
-  // Get available status options based on current status
+  // Get available status options based on context
   const getStatusOptions = () => {
-    return [
-      { value: "upcoming", label: "Upcoming" },
-      { value: "completed", label: "Completed" },
-      { value: "rejected", label: "Rejected" },
-      { value: "succeeded", label: "Succeeded" },
-    ];
+    if (isEditing) {
+      // When editing in Tracker, show succeeded/rejected options
+      return [
+        { value: "upcoming", label: "Upcoming" },
+        { value: "completed", label: "Completed" },
+        { value: "succeeded", label: "Succeeded" },
+        { value: "rejected", label: "Rejected" },
+      ];
+    } else {
+      // When scheduling new interview, only show upcoming/completed
+      return [
+        { value: "upcoming", label: "Upcoming" },
+        { value: "completed", label: "Completed" },
+      ];
+    }
   };
 
   return (

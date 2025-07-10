@@ -55,7 +55,7 @@ const Dashboard = () => {
   });
 
   const stats = {
-    totalApplications: jobApplications.length,
+    totalInterviews: jobApplications.length, // Changed from totalApplications
     upcomingInterviews: jobApplications.filter(job => job.status === "upcoming").length,
     completedInterviews: jobApplications.filter(job => 
       job.status === "completed" || job.status === "succeeded" || job.status === "rejected"
@@ -98,8 +98,8 @@ const Dashboard = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
-              title="Total Applications"
-              value={stats.totalApplications}
+              title="Total Interviews"
+              value={stats.totalInterviews}
               icon={<Target className="h-4 w-4" />}
             />
             <StatCard

@@ -24,7 +24,7 @@ export function JobCard({ job, onEdit, onDelete }: JobCardProps) {
 
   useEffect(() => {
     const checkForRating = async () => {
-      if (!user || job.status !== "completed") return;
+      if (!user || job.status !== "completed" && job.status !== "succeeded" && job.status !== "rejected") return;
       
       try {
         const { data, error } = await supabase
@@ -78,6 +78,10 @@ export function JobCard({ job, onEdit, onDelete }: JobCardProps) {
     }
   };
 
+  const handleViewDetails = () => {
+    navigate(`/job/${job.id}`);
+  };
+
   const handleRateInterview = () => {
     if (hasRating) {
       navigate("/ratings");
@@ -114,7 +118,7 @@ export function JobCard({ job, onEdit, onDelete }: JobCardProps) {
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <DollarSign className="h-4 w-4 mr-2" />
-            <span>{job.salaryLPA}</span>
+            <span>{job.salaryLPA} LPA</span>
           </div>
         </div>
         
@@ -129,7 +133,7 @@ export function JobCard({ job, onEdit, onDelete }: JobCardProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/job/${job.id}`)}
+            onClick={handleViewDetails}
             className="flex-1 min-w-0"
           >
             View Details

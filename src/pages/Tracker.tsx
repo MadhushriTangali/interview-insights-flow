@@ -248,6 +248,7 @@ const Tracker = () => {
           <JobForm
             initialData={editingJob}
             onSave={handleFormSave}
+            isEditing={!!editingJob}
           />
         </DialogContent>
       </Dialog>
