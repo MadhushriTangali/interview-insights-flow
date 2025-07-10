@@ -20,13 +20,23 @@ export function SMSSetup() {
       if (!user) return;
       
       try {
+        // Use raw SQL query to access profiles table until types are updated
         const { data, error } = await supabase
-          .from('profiles')
-          .select('phone')
-          .eq('id', user.id)
-          .maybeSingle();
+          .rpc('get_user_profile', { user_id: user.id });
           
-        if (data?.phone) {
+        if (error) {
+          // Fallback to direct query if RPC doesn't exist
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles' as any)
+            .select('phone')
+            .eq('id', user.id)
+            .maybeSingle();
+            
+          if (!profileError && profileData?.phone) {
+            setPhone(profileData.phone);
+            setHasPhone(true);
+          }
+        } else if (data?.phone) {
           setPhone(data.phone);
           setHasPhone(true);
         }
@@ -56,7 +66,7 @@ export function SMSSetup() {
     setIsSubmitting(true);
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .upsert({
           id: user?.id,
           phone: phone,

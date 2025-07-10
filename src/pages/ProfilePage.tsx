@@ -22,13 +22,33 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      setProfile({
-        email: user.email || "",
-        phone: user.user_metadata?.phone || "",
-        created_at: user.created_at || "",
-      });
-    }
+    const fetchProfile = async () => {
+      if (!user) return;
+      
+      try {
+        // Fetch from profiles table
+        const { data, error } = await supabase
+          .from('profiles' as any)
+          .select('phone')
+          .eq('id', user.id)
+          .maybeSingle();
+          
+        setProfile({
+          email: user.email || "",
+          phone: data?.phone || "",
+          created_at: user.created_at || "",
+        });
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setProfile({
+          email: user.email || "",
+          phone: "",
+          created_at: user.created_at || "",
+        });
+      }
+    };
+    
+    fetchProfile();
   }, [user]);
 
   const handlePhoneSubmit = async (phone: string) => {
@@ -36,9 +56,13 @@ const ProfilePage = () => {
     
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { phone: phone }
-      });
+      const { error } = await supabase
+        .from('profiles' as any)
+        .upsert({
+          id: user.id,
+          phone: phone,
+          updated_at: new Date().toISOString()
+        });
       
       if (error) throw error;
       
