@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { UpcomingInterviews } from "@/components/dashboard/upcoming-interviews";
+import { RejectedInterviews } from "@/components/dashboard/rejected-interviews";
 import { RatingVisualization } from "@/components/dashboard/rating-visualization";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,7 +56,7 @@ const Dashboard = () => {
   });
 
   const stats = {
-    totalInterviews: jobApplications.length, // Changed from totalApplications
+    totalInterviews: jobApplications.length,
     upcomingInterviews: jobApplications.filter(job => job.status === "upcoming").length,
     completedInterviews: jobApplications.filter(job => 
       job.status === "completed" || job.status === "succeeded" || job.status === "rejected"
@@ -64,6 +65,7 @@ const Dashboard = () => {
   };
 
   const upcomingInterviews = jobApplications.filter(job => job.status === "upcoming");
+  const rejectedInterviews = jobApplications.filter(job => job.status === "rejected");
 
   if (isLoading) {
     return (
@@ -119,11 +121,15 @@ const Dashboard = () => {
             />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <UpcomingInterviews 
               interviews={upcomingInterviews} 
               onRefresh={refetch}
             />
+            <RejectedInterviews interviews={rejectedInterviews} />
+          </div>
+          
+          <div className="grid grid-cols-1 gap-8">
             <RatingVisualization ratings={ratings} />
           </div>
         </div>

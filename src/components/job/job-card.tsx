@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface JobCardProps {
   job: JobApplication;
@@ -79,14 +80,26 @@ export function JobCard({ job, onEdit, onDelete }: JobCardProps) {
   };
 
   const handleViewDetails = () => {
-    navigate(`/job/${job.id}`);
+    try {
+      console.log("Navigating to job details:", job.id);
+      navigate(`/job/${job.id}`);
+    } catch (error) {
+      console.error("Error navigating to job details:", error);
+      toast.error("Failed to view job details");
+    }
   };
 
   const handleRateInterview = () => {
-    if (hasRating) {
-      navigate("/ratings");
-    } else {
-      navigate(`/rate-interview/${job.id}`);
+    try {
+      console.log("Navigating to rate interview:", job.id, "hasRating:", hasRating);
+      if (hasRating) {
+        navigate("/ratings");
+      } else {
+        navigate(`/rate-interview/${job.id}`);
+      }
+    } catch (error) {
+      console.error("Error navigating to rate interview:", error);
+      toast.error("Failed to navigate to rating page");
     }
   };
 
