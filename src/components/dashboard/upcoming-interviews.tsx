@@ -73,7 +73,7 @@ export function UpcomingInterviews({ interviews, onRefresh }: UpcomingInterviews
                   </div>
                   <div className="flex items-center text-xs text-muted-foreground">
                     <Clock className="h-3.5 w-3.5 mr-1" />
-                    <span>{format(new Date(interview.interviewDate), "h:mm a")}</span>
+                    <span>{interview.interviewTime}</span>
                   </div>
                 </div>
               </div>

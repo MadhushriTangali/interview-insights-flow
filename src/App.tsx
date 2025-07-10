@@ -45,9 +45,9 @@ const App = () => (
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/job-details/:id" element={<JobDetails />} />
+              <Route path="/job/:id" element={<JobDetails />} />
               <Route path="/edit-job/:id" element={<EditJob />} />
-              <Route path="/rate/:id" element={<RatingPage />} />
+              <Route path="/rate-interview/:id" element={<RatingPage />} />
               <Route path="/ratings" element={<RatingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
