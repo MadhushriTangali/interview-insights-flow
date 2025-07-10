@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -123,23 +122,14 @@ export function JobForm({ initialData, onSave, isLoading = false, isEditing = fa
     setPendingFormData(null);
   };
 
-  // Get available status options based on context
+  // Show all status options
   const getStatusOptions = () => {
-    if (isEditing) {
-      // When editing in Tracker, show succeeded/rejected options
-      return [
-        { value: "upcoming", label: "Upcoming" },
-        { value: "completed", label: "Completed" },
-        { value: "succeeded", label: "Succeeded" },
-        { value: "rejected", label: "Rejected" },
-      ];
-    } else {
-      // When scheduling new interview, only show upcoming/completed
-      return [
-        { value: "upcoming", label: "Upcoming" },
-        { value: "completed", label: "Completed" },
-      ];
-    }
+    return [
+      { value: "upcoming", label: "Upcoming" },
+      { value: "completed", label: "Completed" },
+      { value: "succeeded", label: "Succeeded" },
+      { value: "rejected", label: "Rejected" },
+    ];
   };
 
   return (
@@ -220,6 +210,7 @@ export function JobForm({ initialData, onSave, isLoading = false, isEditing = fa
               )}
             />
             
+            
             <FormField
               control={form.control}
               name="interviewDate"
@@ -277,6 +268,7 @@ export function JobForm({ initialData, onSave, isLoading = false, isEditing = fa
               )}
             />
           </div>
+          
           
           <FormField
             control={form.control}

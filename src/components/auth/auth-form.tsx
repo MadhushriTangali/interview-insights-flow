@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -106,7 +105,7 @@ export function AuthForm({ type }: AuthFormProps) {
         navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-          redirectTo: `${window.location.origin}/reset-password`
+          redirectTo: `${window.location.origin}/auth/reset-password`
         });
         
         if (error) {
@@ -227,7 +226,7 @@ export function AuthForm({ type }: AuthFormProps) {
               <Button 
                 variant="link" 
                 className="p-0 h-auto font-normal" 
-                onClick={() => navigate("/forgot-password")}
+                onClick={() => navigate("/auth/forgot-password")}
                 type="button"
                 disabled={isLoading}
               >
@@ -245,7 +244,7 @@ export function AuthForm({ type }: AuthFormProps) {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => navigate("/forgot-password")}
+                onClick={() => navigate("/auth/forgot-password")}
                 type="button"
                 disabled={isLoading}
                 className="w-full"
@@ -300,7 +299,7 @@ export function AuthForm({ type }: AuthFormProps) {
           <Button 
             variant="link" 
             className="p-0 h-auto font-normal" 
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/auth/register")}
             type="button"
             disabled={isLoading}
           >
@@ -313,7 +312,7 @@ export function AuthForm({ type }: AuthFormProps) {
           <Button 
             variant="link" 
             className="p-0 h-auto font-normal" 
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/auth/login")}
             type="button"
             disabled={isLoading}
           >
