@@ -46,6 +46,45 @@ export type Database = {
           },
         ]
       }
+      interview_questions: {
+        Row: {
+          answer: string
+          company: string
+          created_at: string
+          example: string | null
+          id: string
+          question: string
+          role: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          company: string
+          created_at?: string
+          example?: string | null
+          id?: string
+          question: string
+          role: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          company?: string
+          created_at?: string
+          example?: string | null
+          id?: string
+          question?: string
+          role?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       interview_ratings: {
         Row: {
           body_language: number
