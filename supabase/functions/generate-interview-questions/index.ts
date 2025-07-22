@@ -64,20 +64,37 @@ serve(async (req) => {
       });
     }
 
-    // Generate new questions using OpenAI
-    const prompt = `Generate 3 realistic interview questions for a ${role} position at ${company}. 
-    Include technical, behavioral, and company-specific questions.
-    
-    For each question, provide:
-    1. The question text
-    2. A detailed suggested answer (150-200 words)
-    3. A practical example (50-75 words)
-    4. The question type (technical, behavioral, general, company-specific, project-based, or leadership)
+    // Generate new questions using OpenAI with company-specific details
+    const prompt = `You are an expert interviewer creating realistic interview questions for a ${role} position at ${company}.
 
-    Make the questions challenging but realistic for the role level.
-    Research the company and include specific details about their products, culture, or recent developments.
-    
-    Format the response as a JSON array with objects containing: question, answer, example, type`;
+REQUIREMENTS:
+1. Generate exactly 3 unique, challenging interview questions
+2. Research ${company}'s business, products, culture, recent news, and technologies
+3. Tailor questions specifically for ${role} role requirements
+4. Include a mix of: technical, behavioral, and company-specific questions
+5. Questions should reflect current industry trends and company priorities
+
+For each question provide:
+- question: The interview question (specific to ${company} and ${role})
+- answer: Detailed sample answer (200-250 words) with specific examples
+- example: Practical scenario or project example (75-100 words)
+- type: One of: technical, behavioral, company-specific, leadership, project-based
+
+IMPORTANT: 
+- Make questions company-specific (mention ${company}'s products, values, or challenges)
+- Consider ${company}'s tech stack, market position, and recent developments
+- Ensure questions are appropriate for ${role} seniority level
+- Response must be valid JSON array only, no additional text
+
+Example format:
+[
+  {
+    "question": "How would you approach [specific challenge] at ${company}?",
+    "answer": "Detailed answer with ${company} context...",
+    "example": "In a previous role, I...",
+    "type": "company-specific"
+  }
+]`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -90,12 +107,12 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are an expert interview coach who creates realistic interview questions. Always respond with valid JSON only.' 
+            content: 'You are an expert interview coach. Respond ONLY with valid JSON. No markdown, no explanations, no code blocks - just pure JSON array.' 
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 2000,
+        temperature: 0.8,
+        max_tokens: 3000,
       }),
     });
 
@@ -104,20 +121,55 @@ serve(async (req) => {
     }
 
     const openAIData = await response.json();
-    const generatedContent = openAIData.choices[0].message.content;
+    let generatedContent = openAIData.choices[0].message.content.trim();
+    
+    // Clean up the response - remove markdown code blocks if present
+    if (generatedContent.startsWith('```json')) {
+      generatedContent = generatedContent.replace(/```json\n?/, '').replace(/\n?```$/, '');
+    } else if (generatedContent.startsWith('```')) {
+      generatedContent = generatedContent.replace(/```\n?/, '').replace(/\n?```$/, '');
+    }
 
     let generatedQuestions;
     try {
       generatedQuestions = JSON.parse(generatedContent);
+      
+      // Validate the structure
+      if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
+        throw new Error('Invalid response structure');
+      }
+      
+      // Validate each question has required fields
+      generatedQuestions = generatedQuestions.map(q => ({
+        question: q.question || `What interests you most about working as a ${role} at ${company}?`,
+        answer: q.answer || `Discuss your passion for the role and company values.`,
+        example: q.example || 'Provide a specific example from your experience.',
+        type: q.type || 'general'
+      }));
+      
     } catch (e) {
-      // Fallback if JSON parsing fails
       console.error('Failed to parse OpenAI response as JSON:', generatedContent);
+      console.error('Parse error:', e);
+      
+      // Enhanced fallback with company-specific questions
       generatedQuestions = [
         {
-          question: `What programming languages and frameworks are you most proficient in for ${role} roles at ${company}?`,
-          answer: `Discuss the technologies mentioned in the job description. Highlight your strongest languages first, then mention frameworks you've used in production. Be specific about years of experience and mention any certifications.`,
-          example: `"I have 4 years of experience with JavaScript and React, having built 8 production applications. I'm also proficient in Node.js for backend development and have worked with PostgreSQL databases."`,
+          question: `How would you contribute to ${company}'s mission and what specific skills make you a good fit for this ${role} position?`,
+          answer: `Research ${company}'s mission, values, and recent projects. Highlight how your technical skills, experience, and personal values align with their goals. Mention specific technologies or methodologies you've used that are relevant to their work. Demonstrate knowledge of their products or services and explain how you can help improve or scale their offerings.`,
+          example: `"I've followed ${company}'s work in [specific area] and have [relevant experience]. In my previous role, I successfully [specific achievement] using [relevant technology/approach], which directly relates to the challenges ${company} faces in [specific domain]."`,
+          type: "company-specific"
+        },
+        {
+          question: `Describe a challenging technical problem you've solved that would be relevant to a ${role} role. How did you approach it?`,
+          answer: `Choose a problem that demonstrates skills relevant to the role. Explain your problem-solving methodology: understanding requirements, researching solutions, implementation approach, testing, and iteration. Highlight collaboration with team members, handling of constraints, and lessons learned. Focus on technologies and processes likely used at ${company}.`,
+          example: `"When our system was experiencing performance issues with [specific technology], I analyzed bottlenecks, researched optimization techniques, implemented [specific solution], and achieved [quantifiable improvement] in performance metrics."`,
           type: "technical"
+        },
+        {
+          question: `Tell me about a time when you had to learn a new technology or adapt to changing requirements. How do you stay current with industry trends?`,
+          answer: `Describe a specific situation where you quickly learned new technology or adapted to change. Explain your learning strategy, resources used, and how you applied the knowledge. Mention how you stay updated with industry trends through blogs, courses, conferences, or community involvement. Show adaptability and continuous learning mindset.`,
+          example: `"When our team needed to migrate to [technology], I took initiative to learn it through [specific resources], built a proof of concept, and helped train other team members. I regularly follow [industry resources] to stay current."`,
+          type: "behavioral"
         }
       ];
     }
