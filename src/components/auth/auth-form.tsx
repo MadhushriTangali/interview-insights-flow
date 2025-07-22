@@ -80,12 +80,9 @@ export function AuthForm({ type }: AuthFormProps) {
           throw error;
         }
         
-        if (authData.user && !authData.session) {
-          toast.success("Registration successful! Please check your email to verify your account.");
-        } else if (authData.session) {
-          toast.success("Registration successful! You're now logged in.");
-          navigate("/dashboard");
-        }
+        // Always show success message and redirect to login (don't auto-login)
+        toast.success("Registration successful! Please sign in with your credentials.");
+        navigate("/auth/login");
         } else if (type === "login") {
         const { data: authData, error } = await supabase.auth.signInWithPassword({
           email: data.email,
